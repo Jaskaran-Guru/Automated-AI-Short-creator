@@ -13,6 +13,8 @@ interface Project {
   results: string[];
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -33,7 +35,7 @@ export default function Home() {
 
   const fetchProjects = async () => {
     try {
-      const res = await fetch("http://localhost:8000/projects");
+      const res = await fetch(`${API_BASE_URL}/projects`);
       const data = await res.json();
       setProjects(data);
       if (viewProject) {
@@ -54,7 +56,7 @@ export default function Home() {
 
     try {
       setErrorMessage(null);
-      const res = await fetch("http://127.0.0.1:8000/upload", {
+      const res = await fetch(`${API_BASE_URL}/upload`, {
         method: "POST",
         body: formData,
       });
@@ -76,7 +78,7 @@ export default function Home() {
 
     try {
       setErrorMessage(null);
-      const res = await fetch(`http://127.0.0.1:8000/process/${activeProjectId}?num_shorts=${numShorts}&duration=${duration}`, {
+      const res = await fetch(`${API_BASE_URL}/process/${activeProjectId}?num_shorts=${numShorts}&duration=${duration}`, {
         method: "POST",
       });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
@@ -96,7 +98,7 @@ export default function Home() {
 
   const handleCancelProcessing = async (id: string) => {
     try {
-      await fetch(`http://127.0.0.1:8000/cancel/${id}`, { method: 'POST' });
+      await fetch(`${API_BASE_URL}/cancel/${id}`, { method: 'POST' });
       fetchProjects(); // refresh to show cancelled status
     } catch (err) {
       console.error("Failed to cancel", err);
@@ -105,7 +107,7 @@ export default function Home() {
 
   const handleDeleteProject = async (id: string) => {
     try {
-      await fetch(`http://127.0.0.1:8000/projects/${id}`, { method: 'DELETE' });
+      await fetch(`${API_BASE_URL}/projects/${id}`, { method: 'DELETE' });
       fetchProjects();
     } catch (err) {
       console.error("Failed to delete", err);
@@ -499,7 +501,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
                   {viewProject?.results.map((result: string, idx: number) => {
                     const cleanPath = result.replace(/^output[\\/]/, '').replace(/\\/g, '/');
-                    const videoUrl = `http://127.0.0.1:8000/static/${cleanPath}`;
+                    const videoUrl = `${API_BASE_URL}/static/${cleanPath}`;
                     return (
                       <motion.div 
                         key={idx} 
