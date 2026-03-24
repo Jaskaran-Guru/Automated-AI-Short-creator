@@ -1,0 +1,28 @@
+# Requirements for AI Video Shorts Creator
+# Install with: pip install -r requirements.txt
+
+# ── Core AI & ML ──────────────────────────────────────────────
+openai-whisper>=20231117
+torch>=2.1.0
+torchvision>=0.16.0
+torchaudio>=2.1.0
+clip @ git+https://github.com/openai/CLIP.git
+ultralytics>=8.0.0
+
+# ── Audio Processing ──────────────────────────────────────────
+librosa>=0.10.1
+soundfile>=0.12.1
+numpy>=1.24.0
+
+# ── Image Processing ──────────────────────────────────────────
+Pillow>=10.0.0
+
+# ── Rich CLI & Utilities ──────────────────────────────────────
+rich>=13.0.0
+
+# ── Python Standard Utilities ─────────────────────────────────
+# subprocess, pathlib, json, dataclasses — all stdlib, no install needed
+
+# ── Optional (GPU acceleration) ───────────────────────────────
+# If you have a CUDA GPU, install CUDA-enabled torch instead:
+#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121

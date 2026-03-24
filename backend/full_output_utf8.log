@@ -1,0 +1,295 @@
+﻿uvicorn : Traceback 
+(most recent call 
+last):
+At line:1 char:1
++ uvicorn main:app 
+--log-level debug > 
+full_output.log 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (Traceback (mo   
+ st recent call las    
+t)::String) [], Re    
+moteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  File "<frozen 
+runpy>", line 198, in 
+_run_module_as_main
+  File "<frozen 
+runpy>", line 88, in 
+_run_code
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\S
+cripts\uvicorn.exe\__ma
+in__.py", line 5, in 
+<module>
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\click\
+core.py", line 1157, 
+in __call__
+    return 
+self.main(*args, 
+**kwargs)
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\click\
+core.py", line 1078, 
+in main
+    rv = 
+self.invoke(ctx)
+         
+^^^^^^^^^^^^^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\click\
+core.py", line 1434, 
+in invoke
+    return ctx.invoke(s
+elf.callback, 
+**ctx.params)
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\click\
+core.py", line 783, in 
+invoke
+    return 
+__callback(*args, 
+**kwargs)
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\uvicor
+n\main.py", line 433, 
+in main
+    run(
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\uvicor
+n\main.py", line 606, 
+in run
+    server.run()
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\uvicor
+n\server.py", line 75, 
+in run
+    return asyncio_run(
+self.serve(sockets=sock
+ets), loop_factory=self
+.config.get_loop_factor
+y())
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\asyncio\runners.py",
+ line 194, in run
+    return 
+runner.run(main)
+           
+^^^^^^^^^^^^^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\asyncio\runners.py",
+ line 118, in run
+    return self._loop.r
+un_until_complete(task)
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\asyncio\base_events.
+py", line 687, in 
+run_until_complete
+    return 
+future.result()
+           
+^^^^^^^^^^^^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\uvicor
+n\server.py", line 79, 
+in serve
+    await 
+self._serve(sockets)
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\uvicor
+n\server.py", line 86, 
+in _serve
+    config.load()
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\uvicor
+n\config.py", line 
+441, in load
+    self.loaded_app = i
+mport_from_string(self.
+app)
+                      ^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\uvicor
+n\importer.py", line 
+19, in 
+import_from_string
+    module = importlib.
+import_module(module_st
+r)
+             ^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\importlib\__init__.p
+y", line 90, in 
+import_module
+    return _bootstrap._
+gcd_import(name[level:]
+, package, level)
+           ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
+  File "<frozen importl
+ib._bootstrap>", line 
+1387, in _gcd_import
+  File "<frozen importl
+ib._bootstrap>", line 
+1360, in _find_and_load
+  File "<frozen importl
+ib._bootstrap>", line 
+1331, in 
+_find_and_load_unlocked
+  File "<frozen importl
+ib._bootstrap>", line 
+935, in _load_unlocked
+  File "<frozen importl
+ib._bootstrap_external>
+", line 995, in 
+exec_module
+  File "<frozen importl
+ib._bootstrap>", line 
+488, in _call_with_fram
+es_removed
+  File "D:\Projects\you
+tubeshorts\backend\main
+.py", line 52, in 
+<module>
+    
+@app.post("/upload")
+     
+^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\fastap
+i\routing.py", line 
+1446, in decorator
+    self.add_api_route(
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\fastap
+i\routing.py", line 
+1382, in add_api_route
+    route = 
+route_class(
+            
+^^^^^^^^^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\fastap
+i\routing.py", line 
+945, in __init__
+    self.dependant = 
+get_dependant(
+                     
+^^^^^^^^^^^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\fastap
+i\dependencies\utils.py
+", line 309, in 
+get_dependant
+    param_details = 
+analyze_param(
+                    
+^^^^^^^^^^^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\fastap
+i\dependencies\utils.py
+", line 538, in 
+analyze_param
+    field = 
+create_model_field(
+            
+^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Jass K
+aran\AppData\Local\Prog
+rams\Python\Python312\L
+ib\site-packages\fastap
+i\utils.py", line 75, 
+in create_model_field
+    raise fastapi.excep
+tions.FastAPIError(
+fastapi.exceptions.Fast
+APIError: Invalid args 
+for response field! 
+Hint: check that 
+<class 'sqlalchemy.orm.
+session.Session'> is a 
+valid Pydantic field 
+type. If you are using 
+a return type 
+annotation that is not 
+a valid Pydantic field 
+(e.g. Union[Response, 
+dict, None]) you can 
+disable generating the 
+response model from 
+the type annotation 
+with the path 
+operation decorator 
+parameter 
+response_model=None. 
+Read more: https://fast
+api.tiangolo.com/tutori
+al/response-model/

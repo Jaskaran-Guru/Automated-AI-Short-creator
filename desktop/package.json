@@ -1,0 +1,27 @@
+{
+  "name": "virail-desktop",
+  "version": "1.0.0",
+  "main": "main.js",
+  "description": "VIRAIL: AI Shorts Creator Desktop App",
+  "author": "Jaskaran-Guru",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "cross-env NODE_ENV=development electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.virail.app",
+    "productName": "VIRAIL",
+    "win": {
+      "target": "nsis"
+    },
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.6.4",
+    "cross-env": "^7.0.3"
+  }
+}
