@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -91,7 +91,7 @@ export default function Dashboard() {
               <p className="text-sm opacity-80">Upgrade to Pro for 5x more output and keep growing your audience.</p>
             </div>
           </div>
-          <Link href="/billing">
+          <Link href="/dashboard/billing">
             <Button variant={nudgeLevel === 'critical' ? 'destructive' : 'default'} className="font-bold">Upgrade Now</Button>
           </Link>
         </div>
