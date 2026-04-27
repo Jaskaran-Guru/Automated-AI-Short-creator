@@ -62,27 +62,53 @@ export default function NewProjectPage() {
       }
       const { signature, timestamp, cloudName, apiKey, folder } = await sigRes.json();
 
-      // 2. Upload to Cloudinary directly from browser (CORS-allowed for signed uploads)
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("api_key", apiKey);
-      formData.append("timestamp", timestamp);
-      formData.append("signature", signature);
-      formData.append("folder", folder);
+      // 2. Upload to Cloudinary using Chunked Upload (supports up to 2GB)
+      const chunkSize = 20 * 1024 * 1024; // 20MB chunks
+      const totalSize = file.size;
+      const uniqueUploadId = Math.random().toString(36).substring(2, 15);
+      
+      let uploadResponse = null;
 
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
-        method: "POST",
-        body: formData,
-      });
+      for (let start = 0; start < totalSize; start += chunkSize) {
+        const end = Math.min(start + chunkSize, totalSize);
+        const chunk = file.slice(start, end);
+        
+        const formData = new FormData();
+        formData.append("file", chunk);
+        formData.append("api_key", apiKey);
+        formData.append("timestamp", timestamp);
+        formData.append("signature", signature);
+        formData.append("folder", folder);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error("[CLOUDINARY_UPLOAD_ERROR]", errorData);
-        throw new Error(errorData.error?.message || "Cloudinary upload failed. Check your Cloudinary allowed origins.");
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
+          method: "POST",
+          headers: {
+            "X-Unique-Upload-Id": uniqueUploadId,
+            "Content-Range": `bytes ${start}-${end - 1}/${totalSize}`,
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error("[CLOUDINARY_UPLOAD_ERROR]", errorData);
+          throw new Error(errorData.error?.message || "Cloudinary upload failed. Check your Cloudinary allowed origins.");
+        }
+        
+        // Only the last chunk returns the full upload data
+        if (end === totalSize) {
+          uploadResponse = await response.json();
+        } else {
+          // Update progress
+          setUploadProgress(Math.round((end / totalSize) * 100));
+        }
       }
 
-      const data = await response.json();
-      setVideoUrl(data.secure_url);
+      if (!uploadResponse || !uploadResponse.secure_url) {
+        throw new Error("Upload completed but no URL was returned.");
+      }
+
+      setVideoUrl(uploadResponse.secure_url);
       setIsUploading(false);
       setCurrentStep(1);
 
