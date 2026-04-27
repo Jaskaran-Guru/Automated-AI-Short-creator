@@ -51,12 +51,18 @@ export default function NewProjectPage() {
     videoElement.src = URL.createObjectURL(file);
     
     try {
-      // 1. Get signature
+      // 1. Get signature from our API
       const sigRes = await fetch("/api/upload", { method: "POST" });
-      if (!sigRes.ok) throw new Error("Failed to get signature");
+      if (!sigRes.ok) {
+        const errData = await sigRes.json().catch(() => ({}));
+        if (sigRes.status === 503) {
+          throw new Error("Upload service is not configured on the server. Please add Cloudinary environment variables in Vercel.");
+        }
+        throw new Error(errData.error || `Server error ${sigRes.status}: Could not get upload signature.`);
+      }
       const { signature, timestamp, cloudName, apiKey, folder } = await sigRes.json();
 
-      // 2. Upload to Cloudinary
+      // 2. Upload to Cloudinary directly from browser (CORS-allowed for signed uploads)
       const formData = new FormData();
       formData.append("file", file);
       formData.append("api_key", apiKey);
@@ -72,7 +78,7 @@ export default function NewProjectPage() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error("[CLOUDINARY_UPLOAD_ERROR]", errorData);
-        throw new Error(errorData.error?.message || "Cloudinary upload failed");
+        throw new Error(errorData.error?.message || "Cloudinary upload failed. Check your Cloudinary allowed origins.");
       }
 
       const data = await response.json();
@@ -80,9 +86,9 @@ export default function NewProjectPage() {
       setIsUploading(false);
       setCurrentStep(1);
 
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("Upload failed. Please try again.");
+      setError(err.message || "Upload failed. Please try again.");
       setIsUploading(false);
       setUploadProgress(0);
     }
