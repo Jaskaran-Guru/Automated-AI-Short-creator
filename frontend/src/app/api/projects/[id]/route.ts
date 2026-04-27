@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
+import { getCurrentWorkspace } from "@/lib/agency-context";
 
 export const dynamic = "force-dynamic";
 
@@ -12,13 +13,13 @@ export async function GET(
     const { userId } = await auth();
     if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
-    const dbUser = await db.user.findUnique({ where: { clerkId: userId } });
-    if (!dbUser) return new NextResponse("Unauthorized", { status: 401 });
+    const workspace = await getCurrentWorkspace();
+    if (!workspace) return new NextResponse("Workspace not found", { status: 404 });
 
     const project = await db.project.findUnique({
       where: {
         id: params.id,
-        userId: dbUser.id,
+        workspaceId: workspace.id,
       },
       include: {
         clips: {
