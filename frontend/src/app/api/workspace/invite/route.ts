@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
 import { Role } from "@prisma/client";
 import crypto from "crypto";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     const { userId: clerkId } = await auth();

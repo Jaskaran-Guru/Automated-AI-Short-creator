@@ -3,6 +3,8 @@ import { auth } from "@clerk/nextjs/server";
 import Stripe from "stripe";
 import { db } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_mock", {
   apiVersion: "2023-10-16" as any,
 });
