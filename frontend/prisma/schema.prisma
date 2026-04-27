@@ -1,0 +1,519 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  SUPPORT
+  FINANCE
+  OPS
+  SALES
+  CEO
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MANAGER
+  EDITOR
+  VIEWER
+}
+
+enum Plan {
+  FREE
+  STARTER
+  PRO
+  AGENCY_STARTER
+  AGENCY_GROWTH
+  AGENCY_PRO
+}
+
+enum Status {
+  UPLOADING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum SocialPlatform {
+  YOUTUBE
+  TIKTOK
+  INSTAGRAM
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PROCESSING
+  PUBLISHED
+  FAILED
+  CANCELLED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model User {
+  id            String         @id @default(cuid())
+  clerkId       String         @unique
+  email         String         @unique
+  name          String?
+  
+  // Internal OS Roles
+  systemRole    AdminRole?     
+  isBanned      Boolean        @default(false)
+  banReason     String?
+  
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  lastWeeklyReportSent DateTime?
+  
+  // Agency Multi-Tenancy
+  memberships   WorkspaceMember[]
+  tickets       Ticket[]       @relation("UserTickets")
+  assignedTickets Ticket[]     @relation("AssignedAdmin")
+  auditLogs     AuditLog[]
+  socialAccounts SocialAccount[]
+  socialPosts   SocialPost[]
+  riskFlags     RiskFlag[]
+  eventLogs     EventLog[]
+  recommendations Recommendation[]
+  
+  // Phase 7 Scale Engine
+  leadsOwned    Lead[]         @relation("LeadOwner")
+  affiliate     Affiliate?
+  referralsSent ReferralEvent[] @relation("Referrer")
+  referralReceived ReferralEvent? @relation("Referee")
+  
+  // Phase 8 Category Dominance
+  growthScores     GrowthScoreHistory[]
+  marketplaceItems MarketplaceItem[] @relation("MarketplaceCreator")
+}
+
+model Workspace {
+  id            String         @id @default(cuid())
+  name          String
+  slug          String         @unique
+  logoUrl       String?
+  plan          Plan           @default(FREE)
+  
+  // Usage tracking
+  minutesUsed   Int            @default(0)
+  minutesLimit  Int            @default(1)
+  
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  members       WorkspaceMember[]
+  clients       Client[]
+  subscription  Subscription?
+  invites       Invite[]
+  auditLogs     AuditLog[]     @relation("WorkspaceLogs")
+  eventLogs     EventLog[]
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  role        Role      @default(EDITOR)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([workspaceId, userId])
+}
+
+model Client {
+  id            String    @id @default(cuid())
+  workspaceId   String
+  workspace     Workspace @relation(fields: [workspaceId], references: [id])
+  name          String
+  niche         String?
+  logoUrl       String?
+  website       String?
+  notes         String?   @db.Text
+  isActive      Boolean   @default(true)
+  
+  brandKit      BrandKit?
+  projects      Project[]
+  clips         Clip[]
+  socialAccounts SocialAccount[]
+  socialPosts   SocialPost[]
+  reports       Report[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model BrandKit {
+  id              String   @id @default(cuid())
+  clientId        String   @unique
+  client          Client   @relation(fields: [clientId], references: [id])
+  primaryColor    String?  @default("#3b82f6")
+  secondaryColor  String?
+  fontFamily      String?  @default("Inter")
+  captionStyle    String?  @default("Hormozi")
+  ctaTemplate     String?
+  hashtagDefaults String?
+  toneOfVoice     String?
+  
+  updatedAt       DateTime @updatedAt
+}
+
+model Project {
+  id               String   @id @default(cuid())
+  workspaceId      String?
+  clientId         String?
+  client           Client?  @relation(fields: [clientId], references: [id])
+  userId           String?  // Original user who created it (legacy/tracking)
+  name             String
+  originalVideoUrl String
+  status           Status   @default(UPLOADING)
+  durationSeconds  Int?
+  numShorts        Int?
+  captionStyle     String?
+  processingLog    String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  clips            Clip[]
+}
+
+model Clip {
+  id               String   @id @default(cuid())
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id])
+  clientId         String?
+  client           Client?  @relation(fields: [clientId], references: [id])
+  title            String
+  startTime        Float
+  endTime          Float
+  fileUrl          String
+  score            Float?
+  hookRewrite      String?
+  ctaSuggestion    String?
+  hashtags         String?
+  captionText      String?  @db.Text
+  youtubeTitle     String?
+  tiktokHook       String?
+  instagramCaption String?  @db.Text
+  bestPostingTime  String?
+  createdAt        DateTime @default(now())
+}
+
+model SocialAccount {
+  id           String         @id @default(cuid())
+  clientId     String?
+  client       Client?        @relation(fields: [clientId], references: [id])
+  userId       String
+  user         User           @relation(fields: [userId], references: [id])
+  platform     SocialPlatform
+  accessToken  String         @db.Text
+  refreshToken String?        @db.Text
+  expiresAt    DateTime?
+  username     String?
+  avatarUrl    String?
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  posts        SocialPost[]
+}
+
+model SocialPost {
+  id             String         @id @default(cuid())
+  clientId       String?
+  client         Client?        @relation(fields: [clientId], references: [id])
+  userId         String
+  user           User           @relation(fields: [userId], references: [id])
+  clipId         String
+  accountId      String
+  account        SocialAccount  @relation(fields: [accountId], references: [id])
+  title          String?
+  caption        String?        @db.Text
+  hashtags       String?
+  scheduledFor   DateTime
+  status         PostStatus     @default(DRAFT)
+  thumbnailUrl   String?
+  publishedUrl   String?
+  platformPostId String?
+  errorLog       String?        @db.Text
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model Invite {
+  id          String    @id @default(cuid())
+  email       String
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  role        Role      @default(EDITOR)
+  token       String    @unique
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  clientId    String
+  client      Client   @relation(fields: [clientId], references: [id])
+  month       Int
+  year        Int
+  data        Json
+  shareToken  String?  @unique
+  createdAt   DateTime @default(now())
+}
+
+model Subscription {
+  id               String    @id @default(cuid())
+  workspaceId      String    @unique
+  workspace        Workspace @relation(fields: [workspaceId], references: [id])
+  stripeCustomerId String    @unique
+  stripeSubId      String?   @unique
+  status           String?
+  priceId          String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Ticket {
+  id          String         @id @default(cuid())
+  subject     String
+  message     String         @db.Text
+  status      TicketStatus   @default(OPEN)
+  priority    TicketPriority @default(LOW)
+  category    String?        @default("GENERAL")
+  userId      String
+  user        User           @relation("UserTickets", fields: [userId], references: [id])
+  assignedId  String?
+  assignedTo  User?          @relation("AssignedAdmin", fields: [assignedId], references: [id])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  responses   TicketResponse[]
+}
+
+model TicketResponse {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  userId    String
+  message   String   @db.Text
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model RiskFlag {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  reason    String
+  severity  String   @default("MEDIUM")
+  isResolved Boolean @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Lead {
+  id            String   @id @default(cuid())
+  company       String
+  contact       String
+  email         String   @unique
+  stage         String   @default("LEAD") // LEAD, CONTACTED, QUALIFIED, DEMO, PROPOSAL, WON, LOST
+  notes         String?  @db.Text
+  dealValue     Float?   @default(0)
+  source        String?  // SEO, Referral, Manual
+  nextFollowup  DateTime?
+  ownerId       String?
+  owner         User?    @relation("LeadOwner", fields: [ownerId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deals         Deal[]
+}
+
+model Deal {
+  id            String   @id @default(cuid())
+  leadId        String
+  lead          Lead     @relation(fields: [leadId], references: [id])
+  value         Float
+  currency      String   @default("USD")
+  expectedClose DateTime?
+  probability   Int      @default(50) // 0-100
+  status        String   @default("OPEN")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Affiliate {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+  code          String   @unique
+  totalClicks   Int      @default(0)
+  totalSignups  Int      @default(0)
+  totalRevenue  Float    @default(0)
+  payoutBalance Float    @default(0)
+  payouts       AffiliatePayout[]
+  createdAt     DateTime @default(now())
+}
+
+model AffiliatePayout {
+  id            String   @id @default(cuid())
+  affiliateId   String
+  affiliate     Affiliate @relation(fields: [affiliateId], references: [id])
+  amount        Float
+  status        String   @default("PENDING") // PENDING, PAID, CANCELLED
+  processedAt   DateTime?
+  createdAt     DateTime @default(now())
+}
+
+model ReferralEvent {
+  id            String   @id @default(cuid())
+  referrerId    String
+  referrer      User     @relation("Referrer", fields: [referrerId], references: [id])
+  refereeId     String?  @unique
+  referee       User?    @relation("Referee", fields: [refereeId], references: [id])
+  status        String   @default("PENDING") // PENDING, COMPLETED, REWARDED
+  createdAt     DateTime @default(now())
+}
+
+model GrowthScoreHistory {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  score         Int
+  category      String   // CLIP, ACCOUNT, CAMPAIGN
+  targetId      String   // ID of the project, user, or client
+  timestamp     DateTime @default(now())
+}
+
+model MarketplaceItem {
+  id            String   @id @default(cuid())
+  name          String
+  type          String   // HOOK_PACK, CAPTION_STYLE, CAMPAIGN_BLUEPRINT
+  description   String
+  price         Float    @default(0)
+  creatorId     String
+  creator       User     @relation("MarketplaceCreator", fields: [creatorId], references: [id])
+  stats         Json?    // Usage stats, success rate
+  isFeatured    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+model CaseStudy {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  customerName  String
+  industry      String
+  logoUrl       String?
+  title         String
+  content       String   @db.Text
+  timeSaved     Int?
+  clipsCreated  Int?
+  reachGained   Int?
+  isFeatured    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+model SystemMetric {
+  id        String   @id @default(cuid())
+  key       String   // e.g. "mrr", "churn_rate"
+  value     Float
+  date      DateTime @default(now())
+  
+  @@index([key, date])
+}
+
+model EventLog {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  workspaceId   String?
+  workspace     Workspace? @relation(fields: [workspaceId], references: [id])
+  clientId      String?
+  projectId     String?
+  clipId        String?
+  eventName     String   // e.g. "clip_generated", "hook_copied"
+  metadata      Json?
+  timestamp     DateTime @default(now())
+
+  @@index([eventName, timestamp])
+  @@index([userId, eventName])
+}
+
+model DailyMetric {
+  id            String   @id @default(cuid())
+  key           String   // e.g. "total_clips_generated", "publish_rate"
+  value         Float
+  date          DateTime
+  workspaceId   String?
+  clientId      String?
+  platform      String?
+
+  @@unique([key, date, workspaceId, clientId, platform])
+}
+
+model CohortMetric {
+  id            String   @id @default(cuid())
+  cohortId      String   // e.g. "2024-04-signup"
+  plan          Plan
+  metric        String   // e.g. "retention_d30", "mrr_expansion"
+  value         Float
+  date          DateTime
+
+  @@index([cohortId, metric])
+}
+
+model Recommendation {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  type          String   // e.g. "POSTING_TIME", "CLIP_LENGTH"
+  content       String   @db.Text
+  impactScore   Int      @default(0) // 1-100
+  isDismissed   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+model BenchmarkSnapshot {
+  id            String   @id @default(cuid())
+  niche         String?
+  metric        String   // e.g. "avg_clips_per_week"
+  percentile25  Float
+  percentile50  Float
+  percentile75  Float
+  percentile90  Float
+  updatedAt     DateTime @default(now())
+}
+
+model AuditLog {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id])
+  workspaceId   String?
+  workspace     Workspace? @relation("WorkspaceLogs", fields: [workspaceId], references: [id])
+  action        String
+  entity        String
+  entityId      String?
+  details       String?    @db.Text
+  ip            String?
+  device        String?
+  createdAt     DateTime   @default(now())
+}
+

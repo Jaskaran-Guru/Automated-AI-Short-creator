@@ -1,4 +1,4 @@
-﻿venv_ai/
+venv_ai/
 venv_ai_lite/
 AI_Shorts_Creator/
 __pycache__/
@@ -16,4 +16,8 @@ desktop/dist/
 *.mp3
 *.exe
 *.node
-.env
+.env*
+.env.local
+frontend/.env.local
+backend/.env
+

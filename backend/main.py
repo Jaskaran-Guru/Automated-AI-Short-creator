@@ -19,6 +19,8 @@ import models
 import database
 from database import engine, SessionLocal, get_db
 from sqlalchemy.orm import Session
+from jose import JWTError, jwt
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 # Initialize database
 # Ensure required directories exist
@@ -39,6 +41,31 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Authentication logic (Supabase)
+security = HTTPBearer()
+SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "your-placeholder-secret")
+SUPABASE_ALGORITHM = "HS256"
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=[SUPABASE_ALGORITHM], options={"verify_aud": False})
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+        return user_id
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Could not validate credentials")
+
+# For now, we'll make auth optional to not break the current flow until the user provides the secret
+async def get_user_optional(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)):
+    if not credentials:
+        return "anonymous"
+    try:
+        return await get_current_user(credentials)
+    except:
+        return "anonymous"
 
 class ProjectStatus(BaseModel):
     model_config = {"from_attributes": True}
@@ -113,6 +140,15 @@ async def delete_project(project_id: str, db: Session = Depends(get_db)):
     if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
     
+    # Clean up files
+    project_dir = os.path.join("output", project_id)
+    if os.path.exists(project_dir):
+        shutil.rmtree(project_dir)
+    
+    temp_dir = os.path.join("temp_inputs", project_id)
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
+
     db.delete(db_project)
     db.commit()
     return {"message": "Project deleted"}

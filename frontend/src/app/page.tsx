@@ -1,538 +1,358 @@
-"use client";
+﻿"use client"
 
-import { useState, useEffect } from "react";
-import { Upload, Play, CheckCircle, Clock, Plus, Minus, Download, BarChart2, X, ChevronRight, Settings, Sliders, Trash2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
+import { 
+  Play, Sparkles, Zap, Scissors, LayoutDashboard, Share2, Star, 
+  CheckCircle2, ChevronDown, Globe, MessageSquare, ArrowRight 
+} from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import Link from "next/link"
+import { useState } from "react"
 
-interface Project {
-  id: string;
-  name: string;
-  status: string;
-  progress: number;
-  message: string;
-  results: string[];
-}
+const PricingCard = ({ title, price, features, highlighted = false }: any) => (
+  <div className={`glass p-8 rounded-3xl flex flex-col h-full card-hover ${highlighted ? 'border-blue-500/50 bg-blue-500/5' : 'border-slate-800'}`}>
+    {highlighted && (
+      <Badge className="w-fit mb-4 bg-blue-500 text-white border-none">Most Popular</Badge>
+    )}
+    <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+    <div className="flex items-baseline gap-1 mb-6">
+      <span className="text-4xl font-extrabold text-white">{price}</span>
+      <span className="text-slate-400">/month</span>
+    </div>
+    <ul className="space-y-4 mb-8 flex-1">
+      {features.map((feature: string, i: number) => (
+        <li key={i} className="flex items-center gap-3 text-slate-300 text-sm">
+          <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
+          {feature}
+        </li>
+      ))}
+    </ul>
+    <Button variant={highlighted ? "premium" : "outline"} className="w-full py-6 rounded-xl font-bold">
+      Get Started
+    </Button>
+  </div>
+)
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-
-export default function Home() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [viewProject, setViewProject] = useState<Project | null>(null);
-  const [showConfig, setShowConfig] = useState(false);
-  const [numShorts, setNumShorts] = useState(3);
-  const [duration, setDuration] = useState(30);
-  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'intelligence' | 'archive'>('dashboard');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchProjects();
-    const interval = setInterval(fetchProjects, 5000); 
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/projects`);
-      const data = await res.json();
-      setProjects(data);
-      if (viewProject) {
-        const updated = data.find((p: Project) => p.id === viewProject.id);
-        if (updated) setViewProject(updated);
-      }
-    } catch (err) {
-      console.error("Failed to fetch projects", err);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile) return;
-    setIsUploading(true);
-    
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
-    try {
-      setErrorMessage(null);
-      const res = await fetch(`${API_BASE_URL}/upload`, {
-        method: "POST",
-        body: formData,
-      });
-      if (!res.ok) throw new Error(`Server returned ${res.status}`);
-      const data = await res.json();
-      setActiveProjectId(data.project_id);
-      setShowConfig(true);
-      setIsUploading(false);
-    } catch (err: any) {
-      console.error("Upload failed", err);
-      setErrorMessage(`Network Error: Ensure the Python backend is running on port 8000. (${err.message})`);
-      setIsUploading(false);
-    }
-  };
-
-  const handleStartProcessing = async () => {
-    if (!activeProjectId) return;
-    setIsUploading(true); // Re-use for processing state
-
-    try {
-      setErrorMessage(null);
-      const res = await fetch(`${API_BASE_URL}/process/${activeProjectId}?num_shorts=${numShorts}&duration=${duration}`, {
-        method: "POST",
-      });
-      if (!res.ok) throw new Error(`Server returned ${res.status}`);
-      
-      fetchProjects();
-      setSelectedFile(null);
-      setShowConfig(false);
-      setActiveProjectId(null);
-      setActiveTab('archive'); // Switch to archive to see progress
-    } catch (err: any) {
-      console.error("Processing failed", err);
-      setErrorMessage(`Processing Failed: ${err.message}`);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleCancelProcessing = async (id: string) => {
-    try {
-      await fetch(`${API_BASE_URL}/cancel/${id}`, { method: 'POST' });
-      fetchProjects(); // refresh to show cancelled status
-    } catch (err) {
-      console.error("Failed to cancel", err);
-    }
-  };
-
-  const handleDeleteProject = async (id: string) => {
-    try {
-      await fetch(`${API_BASE_URL}/projects/${id}`, { method: 'DELETE' });
-      fetchProjects();
-    } catch (err) {
-      console.error("Failed to delete", err);
-    }
-  };
-
+const FAQItem = ({ question, answer }: any) => {
+  const [isOpen, setIsOpen] = useState(false)
   return (
-    <main className="min-h-screen bg-[#020202] text-white selection:bg-white/20 relative overflow-hidden">
-      {/* Ambient Background Glows */}
-      <div className="fixed top-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-white/[0.02] rounded-full blur-[120px] pointer-events-none z-0" />
-      <div className="fixed bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-white/[0.015] rounded-full blur-[100px] pointer-events-none z-0" />
-
-      {/* Navigation / Header */}
-      <nav className="border-b border-white/5 sticky top-0 bg-[#020202]/60 backdrop-blur-2xl z-50">
-        <div className="max-w-7xl mx-auto px-8 h-24 flex justify-between items-center">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-16"
-          >
-            <h1 className="text-3xl font-black tracking-tighter premium-gradient cursor-default">VIRAIL</h1>
-            <div className="hidden lg:flex gap-12 text-[11px] font-black tracking-[0.25em] uppercase text-white/40">
-              <span onClick={() => setActiveTab('dashboard')} className={`relative hover:text-white transition-all cursor-pointer ${activeTab === 'dashboard' ? 'text-white' : ''}`}>
-                Dashboard
-                {activeTab === 'dashboard' && <motion.div layoutId="nav-indicator" className="absolute -bottom-[33px] left-0 right-0 h-[3px] bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] rounded-t-full" />}
-              </span>
-              <span onClick={() => setActiveTab('intelligence')} className={`relative hover:text-white transition-all cursor-pointer ${activeTab === 'intelligence' ? 'text-white' : ''}`}>
-                Intelligence
-                {activeTab === 'intelligence' && <motion.div layoutId="nav-indicator" className="absolute -bottom-[33px] left-0 right-0 h-[3px] bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] rounded-t-full" />}
-              </span>
-              <span onClick={() => setActiveTab('archive')} className={`relative hover:text-white transition-all cursor-pointer ${activeTab === 'archive' ? 'text-white' : ''}`}>
-                Archive
-                {activeTab === 'archive' && <motion.div layoutId="nav-indicator" className="absolute -bottom-[33px] left-0 right-0 h-[3px] bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] rounded-t-full" />}
-              </span>
-            </div>
-          </motion.div>
-          
-          <div className="flex items-center gap-8">
-            <label className="group relative cursor-pointer bg-white text-black px-8 py-3.5 rounded-2xl flex items-center gap-3 hover:scale-[1.03] transition-all font-black text-xs active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.1)]">
-              <div className="absolute inset-0 bg-white rounded-2xl blur-md opacity-20 group-hover:opacity-50 transition-opacity duration-500" />
-              <div className="relative flex items-center gap-3 z-10">
-                <Plus size={16} strokeWidth={3} />
-                <span>NEW PRODUCTION</span>
-              </div>
-              <input 
-                type="file" 
-                className="hidden" 
-                onChange={(e) => {
-                  if (e.target.files?.[0]) {
-                    setSelectedFile(e.target.files[0]);
-                    setActiveTab('dashboard');
-                  }
-                }} 
-              />
-            </label>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-8 py-24">
-        {activeTab === 'intelligence' && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center py-20"
-          >
-            <div className="inline-block px-4 py-2 rounded-full border border-white/5 bg-white/[0.02] text-[10px] font-black tracking-[0.3em] uppercase text-white/40 mb-8 mt-12">
-              Next-Gen Analytics
-            </div>
-            <h2 className="text-5xl md:text-7xl font-black mb-8 leading-[0.9] tracking-tightest text-center">
-              Intelligence <span className="premium-gradient">Hub.</span>
-            </h2>
-            <p className="max-w-xl mx-auto text-center text-white/30 text-lg mb-24 font-medium leading-relaxed">
-              Unlock deep behavioral analytics, retention heatmaps, and AI-driven virality forecasting for your generated content.
-            </p>
-            
-            <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                { title: 'Virality Horizon', value: '94.2%', desc: 'Based on multimodal visual-acoustic synthesis.', delay: 0 },
-                { title: 'Retention Prediction', value: '+24s', desc: 'Average viewer watch-time expected increase.', delay: 0.1 },
-                { title: 'Semantic Mapping', value: 'Sync', desc: 'Spatio-temporal alignment of speech & tracking.', delay: 0.2 }
-              ].map((item, i) => (
-                <motion.div 
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: item.delay }}
-                  className="glass p-10 rounded-[2.5rem] border-white/5 relative overflow-hidden group hover:-translate-y-2 transition-transform duration-500"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="w-16 h-16 rounded-[1.5rem] bg-white/5 flex items-center justify-center mb-8 shadow-inner border border-white/5">
-                    <BarChart2 className="text-white/40" size={28} />
-                  </div>
-                  <div className="text-4xl font-black tracking-tighter mb-3">{item.value}</div>
-                  <div className="text-sm font-bold tracking-wide text-white/80 mb-3">{item.title}</div>
-                  <p className="text-xs text-white/30 font-medium leading-relaxed">{item.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-            
-            <div className="mt-20 px-8 py-4 rounded-full border border-white/5 bg-white/[0.01] text-xs font-bold tracking-widest uppercase text-white/20 animate-pulse">
-              System Training & Integration Pending
-            </div>
-          </motion.div>
-        )}
-
-        {/* Error Message Toast */}
-        <AnimatePresence>
-          {errorMessage && (
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="fixed top-28 left-1/2 -translate-x-1/2 z-50 bg-red-500/10 border border-red-500 text-red-100 px-6 py-4 rounded-2xl flex items-center gap-4 shadow-2xl backdrop-blur-xl max-w-lg w-full"
-            >
-              <div className="flex-1 text-sm font-medium">{errorMessage}</div>
-              <button onClick={() => setErrorMessage(null)} className="p-1 hover:bg-white/10 rounded-full"><X size={16} /></button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Empty State Hero */}
-        {activeTab === 'dashboard' && projects.length === 0 && !selectedFile && (
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-32"
-          >
-            <div className="inline-block px-4 py-2 rounded-full border border-white/5 bg-white/[0.02] text-[10px] font-black tracking-[0.3em] uppercase text-white/40 mb-12">
-              Next-Gen AI Content Engine
-            </div>
-            <h2 className="text-7xl md:text-9xl font-black mb-12 leading-[0.9] tracking-tightest">
-              Cinematic <br/> 
-              <span className="premium-gradient">Precision.</span>
-            </h2>
-            <p className="max-w-xl mx-auto text-white/30 text-xl mb-16 font-medium leading-relaxed">
-              VIRAIL distills your raw footage into high-impact viral assets using sophisticated visual appraisal.
-            </p>
-          </motion.div>
-        )}
-
-        {/* 3-Stage Interaction Flow */}
-        {activeTab === 'dashboard' && (
-          <AnimatePresence mode="wait">
-            {selectedFile && !showConfig && (
-              <motion.div 
-                key="uploading"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="glass p-12 rounded-[3rem] mb-20 relative overflow-hidden"
-              >
-                <div className="flex flex-col lg:flex-row items-center justify-between gap-12 w-full">
-                  <div className="flex items-center gap-10 flex-1 min-w-0 w-full">
-                    <div className="w-24 h-24 rounded-[2rem] bg-white flex items-center justify-center text-black shrink-0">
-                      {isUploading ? <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin" /> : <Upload size={32} />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[10px] font-black tracking-[0.3em] uppercase text-white/30 mb-2">Stage 1: Preparation</div>
-                      <h3 className="text-4xl font-bold tracking-tight mb-2 truncate" title={selectedFile.name}>{selectedFile.name}</h3>
-                      <p className="text-white/40 font-medium">Ready for high-fidelity analysis.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-6 shrink-0 w-full lg:w-auto">
-                    <button onClick={() => setSelectedFile(null)} className="px-8 py-4 text-white/40 font-bold hover:text-white transition-colors">Discard</button>
-                    <button 
-                      onClick={handleUpload} 
-                      disabled={isUploading}
-                      className="bg-white text-black whitespace-nowrap px-12 py-5 rounded-2xl font-black transition-all hover:scale-105 active:scale-95 disabled:opacity-50 w-full lg:w-auto text-center"
-                    >
-                      {isUploading ? "UPLOADING..." : "UPLOAD & ANALYZE"}
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-          {showConfig && (
-            <motion.div 
-              key="config"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="glass p-12 rounded-[3rem] mb-20 bg-gradient-to-br from-white/[0.03] to-transparent border-white/10"
-            >
-              <div className="flex flex-col lg:flex-row gap-16">
-                <div className="lg:w-1/3">
-                  <div className="text-[10px] font-black tracking-[0.3em] uppercase text-white/30 mb-4">Stage 2: Configuration</div>
-                  <h3 className="text-5xl font-black tracking-tighter mb-6">Refine your <br/><span className="premium-gradient">Vision.</span></h3>
-                  <p className="text-white/40 font-medium leading-relaxed">
-                    Adjust the parameters below to determine the intensity and pace of your viral collection.
-                  </p>
-                </div>
-
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-10">
-                  {/* Duration Slider */}
-                  <div className="glass p-8 rounded-[2rem] border-white/5 bg-white/[0.01]">
-                    <div className="flex justify-between items-center mb-8">
-                      <div className="flex items-center gap-3">
-                        <Sliders size={18} className="text-white/40" />
-                        <span className="text-xs font-black tracking-widest uppercase text-white/40">Clip Duration</span>
-                      </div>
-                      <span className="text-2xl font-bold italic">{duration}s</span>
-                    </div>
-                    <input 
-                      type="range" min="15" max="60" step="1" 
-                      value={duration} 
-                      onChange={(e) => setDuration(parseInt(e.target.value))}
-                      className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-white"
-                    />
-                    <div className="flex justify-between mt-4 text-[10px] font-bold text-white/20">
-                      <span>QUICK (15s)</span>
-                      <span>STORY (60s)</span>
-                    </div>
-                  </div>
-
-                  {/* Count Stepper */}
-                  <div className="glass p-8 rounded-[2rem] border-white/5 bg-white/[0.01]">
-                    <div className="flex items-center gap-3 mb-8">
-                      <Settings size={18} className="text-white/40" />
-                      <span className="text-xs font-black tracking-widest uppercase text-white/40">Clip Quantity</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <button 
-                        onClick={() => setNumShorts(Math.max(1, numShorts - 1))}
-                        className="w-16 h-16 rounded-2xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all"
-                      >
-                       <Minus size={20} />
-                      </button>
-                      <span className="text-5xl font-black">{numShorts}</span>
-                      <button 
-                        onClick={() => setNumShorts(Math.min(10, numShorts + 1))}
-                        className="w-16 h-16 rounded-2xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all"
-                      >
-                        <Plus size={20} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="lg:w-1/4 flex flex-col justify-end gap-4">
-                  <button 
-                    onClick={handleStartProcessing}
-                    disabled={isUploading}
-                    className="w-full bg-white text-black py-6 rounded-[2rem] font-black text-lg hover:scale-[1.02] transition-all shadow-[0_20px_50px_rgba(255,255,255,0.1)] active:scale-95 disabled:opacity-50"
-                  >
-                    {isUploading ? "STARTING..." : "GENERATE"}
-                  </button>
-                  <button 
-                    onClick={() => setShowConfig(false)}
-                    className="w-full py-4 text-white/30 font-bold hover:text-white transition-colors"
-                  >
-                    Back to Upload
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-            )}
-          </AnimatePresence>
-        )}
-
-        {/* Projects Grid */}
-        {(activeTab === 'archive' || projects.length > 0 && activeTab !== 'dashboard' && activeTab !== 'intelligence') && (
-          <>
-            <div className="flex items-center gap-6 mb-12 mt-12">
-              <h2 className="text-3xl font-black tracking-tight text-white/90">Your Archive</h2>
-              <div className="h-px flex-1 bg-white/5" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-              <AnimatePresence mode="popLayout">
-            {projects.map((project: Project, idx: number) => (
-              <motion.div 
-                key={project.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="group relative min-w-0"
-              >
-                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent rounded-[2.5rem] p-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="glass h-full p-10 rounded-[2.5rem] flex flex-col relative bg-[#0a0a0a] min-w-0">
-                  <div className="flex justify-between items-start mb-10">
-                    <div className="text-[10px] font-black tracking-[0.3em] uppercase text-white/30">
-                      {project.status === "completed" ? "Finalized" : 
-                       project.status === "cancelled" ? "Cancelled" : 
-                       project.status === "failed" ? "Failed" : "Working..."}
-                    </div>
-                    {project.status === "completed" ? (
-                      <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]" />
-                    ) : project.status === "cancelled" || project.status === "failed" ? (
-                      <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]" />
-                    ) : (
-                      <div className="w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_10px_#fff]" />
-                    )}
-                  </div>
-                  
-                  <h3 className="text-3xl font-bold tracking-tight mb-4 truncate leading-none">{project.name}</h3>
-                  <p className="text-white/40 font-medium mb-12 line-clamp-2 text-sm leading-relaxed">{project.message}</p>
-
-                  <div className="mt-auto">
-                    {project.status === "processing" ? (
-                      <div className="space-y-6">
-                        <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                          <motion.div 
-                            className="h-full bg-white"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${project.progress * 100}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-black text-white/30 tracking-widest uppercase truncate max-w-[200px]">{project.message}</span>
-                          <span className="text-lg font-bold italic">{Math.round(project.progress * 100)}%</span>
-                        </div>
-                        <button 
-                          onClick={() => handleCancelProcessing(project.id)}
-                          className="w-full mt-2 bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all"
-                        >
-                          Cancel Operation
-                        </button>
-                      </div>
-                    ) : project.status === "cancelled" || project.status === "failed" ? (
-                      <button 
-                        onClick={() => handleDeleteProject(project.id)}
-                        className="w-full bg-red-500/5 border border-red-500/20 hover:bg-red-500/10 hover:border-red-500/40 py-5 rounded-[1.5rem] font-bold text-red-500/60 hover:text-red-500 flex items-center justify-center gap-2 text-sm transition-all duration-300 group/btn"
-                      >
-                        <Trash2 size={16} className="opacity-50 group-hover/btn:opacity-100 transition-opacity" /> DELETE RECORD
-                      </button>
-                    ) : (
-                      <button 
-                        onClick={() => setViewProject(project)}
-                        className="w-full bg-white/[0.04] border border-white/5 hover:bg-white hover:text-black hover:scale-[1.02] py-5 rounded-[1.5rem] font-bold flex items-center justify-center gap-3 transition-all duration-300"
-                      >
-                        REVIEW COLLECTION <ChevronRight size={16} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-
-            {projects.length === 0 && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="col-span-1 md:col-span-2 lg:col-span-3 border border-dashed border-white/10 bg-white/[0.01] rounded-[3rem] h-[400px] flex flex-col items-center justify-center text-center p-10"
-              >
-                <div className="w-24 h-24 rounded-[2rem] bg-white/5 flex items-center justify-center mb-8 border border-white/5">
-                  <Play className="text-white/20" size={32} />
-                </div>
-                <h3 className="text-3xl font-black tracking-tight mb-4">Archive Empty</h3>
-                <p className="text-white/30 font-medium max-w-sm">
-                  Your generated viral collections and source media will automatically persist here.
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-        </>
-      )}
-      </div>
-
-      {/* Modern Fullscreen Modal */}
+    <div className="border-b border-slate-800 py-6">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between w-full text-left"
+      >
+        <span className="text-lg font-medium text-white">{question}</span>
+        <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
       <AnimatePresence>
-        {viewProject && (
+        {isOpen && (
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[60px]"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
           >
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="glass-dark w-[95vw] h-[90vh] rounded-[4rem] overflow-hidden flex flex-col relative border-white/5"
-            >
-              <div className="p-12 md:p-20 overflow-y-auto custom-scrollbar">
-                <div className="flex justify-between items-start mb-20">
-                  <div>
-                    <div className="text-[10px] font-black tracking-[0.4em] uppercase text-white/30 mb-4">Master Collection</div>
-                    <h2 className="text-6xl font-black tracking-tighter premium-gradient inline-block truncate max-w-full" title={viewProject?.name}>{viewProject?.name}</h2>
-                  </div>
-                  <button 
-                    onClick={() => setViewProject(null)}
-                    className="p-4 bg-white/5 hover:bg-white hover:text-black rounded-full transition-all active:scale-90"
-                  >
-                    <X size={32} />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                  {viewProject?.results.map((result: string, idx: number) => {
-                    const cleanPath = result.replace(/^output[\\/]/, '').replace(/\\/g, '/');
-                    const videoUrl = `${API_BASE_URL}/static/${cleanPath}`;
-                    return (
-                      <motion.div 
-                        key={idx} 
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="group flex flex-col"
-                      >
-                        <div className="aspect-[9/16] bg-zinc-950 rounded-[3rem] overflow-hidden border border-white/5 relative group/vid mb-8 shadow-2xl">
-                          <video 
-                            src={videoUrl} 
-                            className="w-full h-full object-cover"
-                            controls
-                          />
-                        </div>
-                        <a 
-                          href={videoUrl} 
-                          download
-                          className="w-full bg-white text-black py-5 rounded-[1.5rem] font-black text-center flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform"
-                        >
-                          <Download size={18} /> SAVE TO DEVICE
-                        </a>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-            </motion.div>
+            <p className="text-slate-400 mt-4 leading-relaxed">{answer}</p>
           </motion.div>
         )}
       </AnimatePresence>
-    </main>
-  );
+    </div>
+  )
+}
+
+export default function LandingPage() {
+  return (
+    <div className="flex flex-col min-h-screen relative overflow-hidden bg-[#020617]">
+      {/* Background Orbs */}
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob"></div>
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob animation-delay-4000"></div>
+
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full glass-dark mt-4 rounded-full border border-white/5">
+        <div className="flex items-center gap-2">
+          <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-1.5 rounded-lg">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-white uppercase letter-spacing-widest">Virail</span>
+        </div>
+        <div className="hidden md:flex gap-8 text-sm font-medium text-slate-300">
+          <Link href="#features" className="hover:text-white transition-colors">Features</Link>
+          <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
+          <Link href="#faq" className="hover:text-white transition-colors">FAQ</Link>
+        </div>
+        <div className="flex gap-3 items-center">
+          <Link href="/sign-in" className="text-sm font-medium text-slate-300 hover:text-white px-4 transition-colors">Log in</Link>
+          <Link href="/dashboard">
+            <Button variant="premium" className="rounded-full px-6">Start Free</Button>
+          </Link>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <main className="flex-1 pt-40 pb-20 px-6">
+        <div className="max-w-5xl mx-auto flex flex-col items-center text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Badge variant="outline" className="mb-8 py-1.5 px-5 text-sm font-medium border-blue-500/30 text-blue-400 bg-blue-500/5 backdrop-blur-sm rounded-full">
+              <Sparkles className="w-3.5 h-3.5 mr-2 inline" />
+              Revolutionizing Video Content with AI
+            </Badge>
+          </motion.div>
+          
+          <motion.h1 
+            className="text-6xl md:text-8xl font-black tracking-tight mb-8 leading-[0.9] text-white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            Turn One Video Into a <br/>
+            <span className="premium-gradient">Month of Content.</span>
+          </motion.h1>
+          
+          <motion.p 
+            className="text-lg md:text-2xl text-slate-400 max-w-3xl mb-12 leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            AI clips, captions, titles, and scheduling for creators who want growth without a team. Publish it all automatically.
+          </motion.p>
+          
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <Link href="/dashboard">
+              <Button variant="premium" size="lg" className="text-lg px-10 py-7 h-auto w-full sm:w-auto font-bold rounded-2xl shadow-lg shadow-blue-500/20">
+                Start Creating Free
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Button variant="glass" size="lg" className="text-lg px-10 py-7 h-auto w-full sm:w-auto border-slate-800 font-bold rounded-2xl">
+              <Play className="w-5 h-5 mr-2" />
+              Watch Demo
+            </Button>
+          </motion.div>
+
+          {/* Social Proof */}
+          <motion.div 
+            className="mt-20 flex flex-col items-center gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.6 }}
+          >
+             <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Trusted by creators worldwide</p>
+             <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all">
+                <span className="text-2xl font-bold text-slate-300 flex items-center gap-2"><Globe className="w-6 h-6"/> TechFlow</span>
+                <span className="text-2xl font-bold text-slate-300 flex items-center gap-2"><MessageSquare className="w-6 h-6"/> PodCastX</span>
+                <span className="text-2xl font-bold text-slate-300 flex items-center gap-2"><Zap className="w-6 h-6"/> ViralMedia</span>
+             </div>
+          </motion.div>
+        </div>
+
+        {/* Preview Image */}
+        <motion.div 
+          className="mt-32 max-w-6xl mx-auto relative group"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+          <div className="relative glass rounded-[2.2rem] overflow-hidden border border-white/10">
+            <div className="bg-slate-900/50 p-4 flex items-center gap-2 border-b border-white/5">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
+                </div>
+                <div className="ml-4 px-3 py-1 rounded bg-slate-800/50 text-[10px] text-slate-400 font-mono">virail.app/dashboard/new</div>
+            </div>
+            <div className="aspect-video bg-[#0f172a] flex items-center justify-center p-12">
+               <div className="grid grid-cols-4 gap-6 w-full h-full">
+                  <div className="col-span-3 bg-slate-800/40 rounded-2xl border border-slate-700/50 flex items-center justify-center relative overflow-hidden">
+                      <div className="absolute inset-0 shimmer opacity-20"></div>
+                      <div className="text-slate-600 font-bold uppercase tracking-widest text-xs">Video Editor Interface</div>
+                  </div>
+                  <div className="col-span-1 space-y-4">
+                      {[1,2,3].map(i => (
+                        <div key={i} className="aspect-[9/16] bg-slate-800/40 rounded-xl border border-slate-700/50 flex flex-col items-center justify-center p-4">
+                           <div className="w-full h-2 bg-slate-700/50 rounded-full mb-auto"></div>
+                           <Zap className="w-6 h-6 text-blue-500/40 mb-2" />
+                           <div className="w-3/4 h-2 bg-slate-700/50 rounded-full mt-auto"></div>
+                        </div>
+                      ))}
+                  </div>
+               </div>
+            </div>
+          </div>
+        </motion.div>
+      </main>
+
+      {/* Features Grid */}
+      <section id="features" className="py-32 px-6 max-w-7xl mx-auto w-full">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="max-w-2xl">
+            <Badge variant="premium" className="mb-4">Features</Badge>
+            <h2 className="text-4xl md:text-6xl font-black text-white leading-[1.1]">Everything you need <br/> to go viral.</h2>
+          </div>
+          <p className="text-slate-400 text-lg max-w-md">Our AI engine replaces an entire editing team, giving you high-retention clips in minutes.</p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { icon: Sparkles, title: "AI Moment Detection", desc: "Our engine analyzes emotion, pacing, and keywords to identify segments with the highest viral potential." },
+            { icon: Scissors, title: "Smart Auto-Reframing", desc: "Perfectly tracks speakers and action to convert landscape video into high-impact 9:16 vertical clips." },
+            { icon: Globe, title: "Auto-Distribution", desc: "One-click scheduling for TikTok, Instagram Reels, and YouTube Shorts. Fill your calendar in seconds." },
+            { icon: Share2, title: "Animated Captions", desc: "Choose from world-class styles like Hormozi, MrBeast, and Neon to maximize viewer retention." },
+            { icon: MessageSquare, title: "Platform Rewrites", desc: "AI generates unique titles and captions tailored for YouTube, TikTok, and Instagram Reels." },
+            { icon: Star, title: "Virality Scoring", desc: "Each clip gets a data-driven score so you know exactly what to post for maximum engagement." }
+          ].map((feature, i) => (
+            <motion.div 
+              key={i} 
+              className="glass p-10 rounded-[2rem] hover:bg-slate-800/50 transition-all border-slate-800 flex flex-col gap-6 group"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+            >
+              <div className="bg-blue-500/10 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <feature.icon className="w-7 h-7 text-blue-500" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold mb-3 text-white">{feature.title}</h3>
+                <p className="text-slate-400 leading-relaxed">{feature.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-32 px-6 bg-slate-950/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <Badge variant="premium" className="mb-4">Testimonials</Badge>
+            <h2 className="text-4xl md:text-5xl font-black text-white">Loved by creators who scale.</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { name: "Sarah Jenkins", role: "Podcaster", text: "Virail saved me 20 hours a month. I used to spend days clipping, now it's done before my coffee is cold.", stars: 5 },
+              { name: "David Chen", role: "Marketing Lead", text: "The auto-distribution is the killer feature. Scheduling a month of content in 2 minutes changed our entire workflow.", stars: 5 },
+              { name: "Marcus Thorne", role: "Content Creator", text: "The caption styles are industry-standard. People keep asking which editor I hired. It's just Virail.", stars: 5 },
+            ].map((t, i) => (
+              <Card key={i} className="bg-slate-900/50 border-slate-800 p-8 rounded-[2rem] glass-panel">
+                <div className="flex gap-1 mb-4">
+                  {[...Array(t.stars)].map((_, i) => <Star key={i} className="w-4 h-4 fill-yellow-500 text-yellow-500" />)}
+                </div>
+                <p className="text-slate-300 italic mb-6">"{t.text}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-slate-800" />
+                  <div>
+                    <p className="text-sm font-bold text-white">{t.name}</p>
+                    <p className="text-[10px] uppercase font-black tracking-widest text-slate-500">{t.role}</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-32 px-6 max-w-7xl mx-auto w-full relative">
+        <div className="text-center mb-20">
+          <h2 className="text-4xl md:text-6xl font-black text-white mb-6">Simple, Transparent Pricing.</h2>
+          <p className="text-slate-400 text-lg">Choose the plan that fits your growth.</p>
+        </div>
+
+        <div className="grid md:grid-cols-4 gap-6">
+          <PricingCard 
+            title="Free" 
+            price="$0" 
+            features={["1 video/month", "Watermarked clips", "Standard AI", "720p Export"]} 
+          />
+          <PricingCard 
+            title="Starter" 
+            price="$29" 
+            features={["60 processing minutes / mo", "No Watermark", "Viral Moment Detection", "1080p HD", "Email Support"]} 
+            highlighted={true}
+          />
+          <PricingCard 
+            title="Pro" 
+            price="$79" 
+            features={["300 processing minutes / mo", "Auto Distribution Engine", "Social Media Scheduler", "Analytics Dashboard", "Priority AI"]} 
+          />
+          <PricingCard 
+            title="Agency" 
+            price="$299" 
+            features={["1500 processing minutes / mo", "Multi-Client Mgmt", "White-labeling", "Bulk Export", "Account Manager"]} 
+          />
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="py-32 px-6 max-w-4xl mx-auto w-full">
+        <div className="text-center mb-20">
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">Frequently Asked Questions</h2>
+        </div>
+        <div className="glass p-8 md:p-12 rounded-[2.5rem] border-slate-800">
+          <FAQItem 
+            question="What types of videos work best?" 
+            answer="Podcasts, interviews, webinars, and talking-head videos work best. Our AI is optimized for speech-driven content where it can identify high-value insights and emotional peaks." 
+          />
+          <FAQItem 
+            question="How long does it take to process a video?" 
+            answer="Typically, it takes about 1/3 of the video's length. A 30-minute video will be transcribed and clipped in about 10 minutes." 
+          />
+          <FAQItem 
+            question="Can I customize the caption styles?" 
+            answer="Yes! We offer presets like Alex Hormozi, MrBeast, and Neon Viral, but you can also customize fonts, colors, and animations to match your brand." 
+          />
+          <FAQItem 
+            question="Does it work in other languages?" 
+            answer="Yes, Virail supports over 50 languages for transcription and captioning, including Spanish, French, German, Hindi, and Mandarin." 
+          />
+        </div>
+      </section>
+
+      {/* CTA Footer */}
+      <footer className="py-32 px-6 border-t border-slate-900 bg-[#020617] relative z-10">
+        <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
+          <div className="bg-blue-500/10 p-4 rounded-3xl mb-10">
+             <Zap className="w-12 h-12 text-blue-500" />
+          </div>
+          <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tight">Ready to go viral?</h2>
+          <Link href="/dashboard">
+            <Button variant="premium" size="lg" className="text-xl px-12 py-8 h-auto rounded-3xl font-bold">
+              Get Started for Free
+            </Button>
+          </Link>
+          <p className="mt-8 text-slate-500 font-medium">No credit card required.</p>
+          
+          <div className="mt-32 pt-16 border-t border-slate-900 w-full flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="flex items-center gap-2">
+              <Zap className="w-6 h-6 text-blue-500" />
+              <span className="text-xl font-bold text-white uppercase">Virail</span>
+            </div>
+            <div className="flex gap-8 text-sm text-slate-500">
+               <Link href="#" className="hover:text-white transition-colors">Twitter</Link>
+               <Link href="#" className="hover:text-white transition-colors">LinkedIn</Link>
+               <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
+               <Link href="#" className="hover:text-white transition-colors">Terms</Link>
+            </div>
+            <p className="text-sm text-slate-600">Â© 2024 Virail AI Inc. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
 }

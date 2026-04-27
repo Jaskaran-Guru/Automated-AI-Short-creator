@@ -2,53 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  border: 10px solid red !important;
+:root {
+  --background: #05070a;
+  --foreground: #ffffff;
+  --accent: #3b82f6;
+  --accent-foreground: #ffffff;
+  --muted: #64748b;
+  --muted-foreground: #94a3b8;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.05);
+  --ring: #3b82f6;
+  --radius: 1.5rem;
 }
 
-:root {
-  --background: #050505;
-  --foreground: #ffffff;
-  --accent: #ffffff;
-  --muted: #888888;
-  --glass: rgba(255, 255, 255, 0.02);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --sidebar: #0a0a0a;
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(255, 255, 255, 0.05) 0, transparent 40%),
-    radial-gradient(at 100% 100%, rgba(255, 255, 255, 0.05) 0, transparent 40%);
+    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(59, 130, 246, 0.05) 0, transparent 50%);
+  background-attachment: fixed;
   min-height: 100vh;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
 .glass {
-  background: var(--glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-.glass-dark {
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: 1px solid var(--glass-border);
+.glass-panel {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.4) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .premium-gradient {
-  background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+  background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
+.premium-gradient-bg {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
 .accent-gradient {
-  background: linear-gradient(90deg, #f8fafc, #94a3b8);
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -66,9 +83,50 @@ html {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #222;
+  background: #334155;
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #333;
+  background: #475569;
+}
+/* Animations */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Shimmer Effect */
+.shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.05) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Card Hover */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-hover:hover {
+  transform: translateY(-5px);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.2);
 }
