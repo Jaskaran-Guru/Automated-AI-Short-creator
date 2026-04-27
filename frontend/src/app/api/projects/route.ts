@@ -73,14 +73,23 @@ export async function POST(req: Request) {
     });
 
     // Enqueue the job for the worker to pick up
-    const videoQueue = getVideoQueue();
-    await videoQueue.add("process-video", {
-      projectId: project.id,
-      videoUrl,
-      numShorts: project.numShorts,
-      duration: project.durationSeconds,
-      captionStyle: project.captionStyle,
-    });
+    try {
+      if (!process.env.REDIS_URL) {
+        console.warn("[QUEUE_WARNING] REDIS_URL not set. Video processing will not start automatically.");
+      } else {
+        const videoQueue = getVideoQueue();
+        await videoQueue.add("process-video", {
+          projectId: project.id,
+          videoUrl,
+          numShorts: project.numShorts,
+          duration: project.durationSeconds,
+          captionStyle: project.captionStyle,
+        });
+      }
+    } catch (queueError) {
+      console.error("[QUEUE_ADD_ERROR]", queueError);
+      // Don't throw here, let the project creation succeed so the user isn't stuck
+    }
 
     await db.project.update({
       where: { id: project.id },

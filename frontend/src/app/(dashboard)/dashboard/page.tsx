@@ -161,13 +161,13 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map((project, i) => (
-              <motion.div 
-                key={project.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="group relative rounded-[2.5rem] overflow-hidden glass-panel border-slate-800 hover:border-blue-500/30 transition-all cursor-pointer"
-              >
+              <Link href={`/project/${project.id}`} key={project.id}>
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="group relative rounded-[2.5rem] overflow-hidden glass-panel border-slate-800 hover:border-blue-500/30 transition-all cursor-pointer h-full"
+                >
                 <div className="aspect-[16/9] relative bg-slate-800/50 overflow-hidden">
                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent opacity-60"></div>
                    
@@ -223,8 +223,9 @@ export default function Dashboard() {
                          </button>
                       </div>
                    </div>
-                </div>
+                 </div>
               </motion.div>
+              </Link>
             ))}
           </div>
         )}
