@@ -5,6 +5,8 @@ import { db } from "@/lib/prisma";
 import { getCurrentWorkspace } from "@/lib/agency-context";
 import { getVideoQueue } from "@/lib/queue";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const { userId } = await auth();
