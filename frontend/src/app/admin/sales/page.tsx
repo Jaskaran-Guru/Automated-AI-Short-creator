@@ -1,4 +1,4 @@
-﻿import { protectAdminPage } from "@/lib/admin-auth";
+import { protectAdminPage } from "@/lib/admin-auth";
 import { db } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,24 @@ export default async function AdminSalesPage() {
     { name: "WON", color: "bg-emerald-500/10 text-emerald-500" },
   ];
 
-  const totalPipelineValue = leads.reduce((acc, lead) => acc + (lead.dealValue || 0), 0);
+  const totalPipelineValue = leads
+    .filter(l => l.stage !== 'WON' && l.stage !== 'LOST')
+    .reduce((acc, lead) => acc + (lead.dealValue || 0), 0);
+
+  const wonDeals = leads.filter(l => l.stage === 'WON');
+  const wonValue = wonDeals.reduce((acc, l) => acc + (l.dealValue || 0), 0);
+  
+  const winRate = leads.length > 0 ? (wonDeals.length / leads.filter(l => l.stage === 'WON' || l.stage === 'LOST').length || 0) * 100 : 0;
+
+  // Sales Velocity (Days from creation to WON)
+  const avgVelocity = wonDeals.length > 0 
+    ? wonDeals.reduce((acc, l) => acc + (new Date(l.updatedAt).getTime() - new Date(l.createdAt).getTime()), 0) / wonDeals.length / 86400000 
+    : 0;
+
+  const isStale = (updatedAt: Date) => {
+    const daysSince = (Date.now() - new Date(updatedAt).getTime()) / 86400000;
+    return daysSince > 3;
+  };
 
   return (
     <div className="p-8 max-w-[1600px] mx-auto">
@@ -73,13 +90,13 @@ export default async function AdminSalesPage() {
         <Card className="bg-slate-900/50 border-slate-800 p-6 rounded-[2rem] glass-panel relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl rounded-full" />
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Won (MTD)</p>
-            <h3 className="text-4xl font-black text-emerald-500">${leads.filter(l => l.stage === 'WON').reduce((acc, l) => acc + (l.dealValue || 0), 0).toLocaleString()}</h3>
-            <p className="text-[10px] text-emerald-600 font-bold uppercase mt-2">Win Rate: 32%</p>
+            <h3 className="text-4xl font-black text-emerald-500">${wonValue.toLocaleString()}</h3>
+            <p className="text-[10px] text-emerald-600 font-bold uppercase mt-2">Win Rate: {winRate.toFixed(0)}%</p>
         </Card>
         <Card className="bg-slate-900/50 border-slate-800 p-6 rounded-[2rem] glass-panel relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 blur-3xl rounded-full" />
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Sales Velocity</p>
-            <h3 className="text-4xl font-black text-white">12.4 Days</h3>
+            <h3 className="text-4xl font-black text-white">{avgVelocity.toFixed(1)} Days</h3>
             <p className="text-[10px] text-orange-400 font-bold uppercase mt-2">Lead to Close</p>
         </Card>
       </div>
@@ -95,8 +112,10 @@ export default async function AdminSalesPage() {
             <Card key={lead.id} className="bg-slate-900/50 border-slate-800 p-6 rounded-[2.5rem] glass-panel hover:border-blue-500/30 transition-all cursor-pointer group">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="flex items-center gap-4 min-w-[300px]">
-                        <div className="bg-slate-800 p-3 rounded-2xl border border-white/5 group-hover:bg-blue-500/10 transition-colors">
-                            <Briefcase className="w-5 h-5 text-slate-400 group-hover:text-blue-400" />
+                        <div className={`p-3 rounded-2xl border transition-colors ${
+                            isStale(lead.updatedAt) ? 'bg-red-500/10 border-red-500/20' : 'bg-slate-800 border-white/5 group-hover:bg-blue-500/10'
+                        }`}>
+                            <Briefcase className={`w-5 h-5 ${isStale(lead.updatedAt) ? 'text-red-400' : 'text-slate-400 group-hover:text-blue-400'}`} />
                         </div>
                         <div>
                             <h4 className="text-lg font-black text-white uppercase tracking-tight">{lead.company}</h4>

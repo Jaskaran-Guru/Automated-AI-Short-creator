@@ -1,4 +1,4 @@
-﻿import { protectAdminPage } from "@/lib/admin-auth";
+import { protectAdminPage } from "@/lib/admin-auth";
 import { Card } from "@/components/ui/card";
 import {
   TrendingUp, AlertCircle, AlertTriangle,
@@ -6,12 +6,13 @@ import {
   ArrowUpRight, ArrowDownRight
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { projectRevenue, CURRENT_INPUTS } from "@/lib/revenue-forecast";
+import { projectRevenue, getLiveRevenueInputs } from "@/lib/revenue-forecast";
 
 export default async function ForecastPage() {
   await protectAdminPage(["SUPER_ADMIN"]);
 
-  const projection = projectRevenue(CURRENT_INPUTS);
+  const inputs = await getLiveRevenueInputs();
+  const projection = projectRevenue(inputs);
 
   const confidenceStyle = {
     HIGH: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",

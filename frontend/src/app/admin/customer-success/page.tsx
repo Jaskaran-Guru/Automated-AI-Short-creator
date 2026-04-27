@@ -8,22 +8,23 @@ import {
   Mail, ArrowRight, Star
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { getLiveHealthReports, UserHealthReport } from "@/lib/retention";
 
 export default async function CustomerSuccessPage() {
   await protectAdminPage(["SUPER_ADMIN", "ADMIN", "SUPPORT"]);
 
+  const healthReports = await getLiveHealthReports();
   const users = await db.user.findMany({
     include: { memberships: { include: { workspace: true } } },
-    orderBy: { updatedAt: 'asc' },
-    take: 50
+    orderBy: { updatedAt: 'desc' },
   });
 
-  // Mock health segmentation (in production: from retention.ts batch run)
+  // Health segmentation from real data
   const segments = {
-    CHAMPION: users.slice(0, 8),
-    HEALTHY:  users.slice(8, 22),
-    AT_RISK:  users.slice(22, 35),
-    CRITICAL: users.slice(35, 50),
+    CHAMPION: users.filter(u => healthReports.find(r => r.userId === u.id)?.tier === "CHAMPION"),
+    HEALTHY:  users.filter(u => healthReports.find(r => r.userId === u.id)?.tier === "HEALTHY"),
+    AT_RISK:  users.filter(u => healthReports.find(r => r.userId === u.id)?.tier === "AT_RISK"),
+    CRITICAL: users.filter(u => healthReports.find(r => r.userId === u.id)?.tier === "CRITICAL"),
   };
 
   const segmentConfig = {

@@ -1,10 +1,11 @@
-﻿/**
+/**
  * VIRAIL Revenue Predictability Engine
  * Removes revenue randomness by modeling forward projections
  * from real operational inputs.
  *
  * Run nightly or on-demand from /admin/forecast
  */
+import { db } from "./prisma";
 
 export interface RevenueInputs {
   currentMRR: number;
@@ -188,3 +189,58 @@ export const CURRENT_INPUTS: RevenueInputs = {
   monthlyChurnRate: 0.025,
   expansionRate: 0.04,
 };
+
+/**
+ * Aggregates real data from Prisma to populate the RevenueInputs model.
+ */
+export async function getLiveRevenueInputs(): Promise<RevenueInputs> {
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const planValues: any = {
+    FREE: 0, STARTER: 49, PRO: 99, 
+    AGENCY_STARTER: 299, AGENCY_GROWTH: 599, AGENCY_PRO: 999
+  };
+
+  const [
+    workspaces,
+    activeTrials,
+    wonLeadsMonth,
+    totalLeadsMonth,
+    demosBookedWeek,
+    churnEventsMonth,
+  ] = await Promise.all([
+    db.workspace.findMany({ select: { plan: true } }),
+    db.workspace.count({ where: { plan: "FREE", createdAt: { gte: monthAgo } } }),
+    db.lead.findMany({ where: { stage: "WON", updatedAt: { gte: monthAgo } } }),
+    db.lead.count({ where: { createdAt: { gte: monthAgo } } }),
+    db.lead.count({ where: { stage: "DEMO", updatedAt: { gte: weekAgo } } }),
+    db.eventLog.count({ where: { eventName: "subscription_cancelled", timestamp: { gte: monthAgo } } }),
+  ]);
+
+  const currentMRR = workspaces.reduce((acc, ws) => acc + (planValues[ws.plan] || 0), 0);
+  
+  // Trial conversion rate = Won leads / Total leads (simplified)
+  const trialConversionRate = totalLeadsMonth > 0 ? wonLeadsMonth.length / totalLeadsMonth : 0.2;
+  
+  const avgRevenuePerUser = wonLeadsMonth.length > 0 
+    ? wonLeadsMonth.reduce((acc, l) => acc + (l.dealValue || 0), 0) / wonLeadsMonth.length 
+    : 99;
+
+  const monthlyChurnRate = currentMRR > 0 ? (churnEventsMonth * 49) / currentMRR : 0.02;
+
+  return {
+    currentMRR,
+    activeTrials,
+    trialConversionRate: Math.max(0.05, trialConversionRate),
+    avgRevenuePerUser,
+    activationRate: 0.45, // Hard to compute without specific event tagging logic
+    demoToCloseRate: 0.3,
+    demosBookedThisWeek: demosBookedWeek,
+    avgDealValue: 599,
+    monthlyChurnRate: Math.max(0.01, monthlyChurnRate),
+    expansionRate: 0.03,
+  };
+}
+

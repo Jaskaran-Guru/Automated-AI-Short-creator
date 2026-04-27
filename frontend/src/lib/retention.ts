@@ -1,8 +1,10 @@
-﻿/**
+/**
  * VIRAIL Retention Hard Systems
  * Retention is infrastructure, not a campaign.
  * This engine runs nightly and ensures no user silently churns.
  */
+import { db } from "./prisma";
+import { Plan } from "@prisma/client";
 
 export type RetentionSignal =
   | "INACTIVE_7D"
@@ -178,3 +180,58 @@ export function batchHealthCheck(users: UserHealthInput[]): UserHealthReport[] {
     .map(analyzeUserHealth)
     .sort((a, b) => a.healthScore - b.healthScore);
 }
+
+/**
+ * Fetches real usage data for all users to feed into the health engine.
+ */
+export async function getLiveHealthReports(): Promise<UserHealthReport[]> {
+  const users = await db.user.findMany({
+    include: {
+      memberships: {
+        include: {
+          workspace: {
+            include: {
+              subscription: true
+            }
+          }
+        }
+      },
+      eventLogs: {
+        orderBy: { timestamp: "desc" },
+        take: 100 // Last 100 events per user
+      }
+    }
+  });
+
+  const healthInputs: UserHealthInput[] = users.map(user => {
+    const workspace = user.memberships[0]?.workspace;
+    const lastLogin = user.updatedAt; // Simplified: last updated as last activity
+    const daysSinceLastLogin = Math.floor((Date.now() - new Date(lastLogin).getTime()) / 86400000);
+    
+    const clipEvents = user.eventLogs.filter(e => e.eventName === "clip_generated");
+    const lastClip = clipEvents[0]?.timestamp || new Date(0);
+    const daysSinceLastClip = Math.floor((Date.now() - new Date(lastClip).getTime()) / 86400000);
+
+    const hasUsedScheduler = user.eventLogs.some(e => e.eventName === "clip_scheduled");
+    const hasUsedAnalytics = user.eventLogs.some(e => e.eventName === "analytics_viewed");
+    const hasInvitedTeamMember = user.eventLogs.some(e => e.eventName === "team_invite_sent");
+
+    return {
+      userId: user.id,
+      plan: (workspace?.plan as any) || "FREE",
+      daysSinceLastLogin,
+      daysSinceLastClip,
+      minutesUsed: workspace?.minutesUsed || 0,
+      minutesLimit: workspace?.minutesLimit || 0,
+      hasUsedScheduler,
+      hasUsedAnalytics,
+      hasInvitedTeamMember,
+      totalClipsAllTime: clipEvents.length,
+      clipsThisMonth: clipEvents.filter(e => e.timestamp > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length,
+      referralsCount: 0, // Placeholder
+    };
+  });
+
+  return batchHealthCheck(healthInputs);
+}
+

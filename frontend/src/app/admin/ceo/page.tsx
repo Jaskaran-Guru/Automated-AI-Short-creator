@@ -10,6 +10,7 @@ import {
   ArrowUpRight, ArrowDownRight, Minus
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { getOSMetrics } from "@/lib/os-metrics";
 
 export default async function CEOMorningViewPage() {
   await protectAdminPage(["SUPER_ADMIN"]);
@@ -19,34 +20,17 @@ export default async function CEOMorningViewPage() {
   todayStart.setHours(0, 0, 0, 0);
 
   // Pull live data
+  const liveMetrics = await getOSMetrics();
+  
   const [
     newLeadsToday,
     totalOpenDeals,
-    ticketsResolved,
-    activeUsers,
   ] = await Promise.all([
     db.lead.count({ where: { createdAt: { gte: todayStart } } }),
     db.lead.count({ where: { stage: { notIn: ["WON", "LOST"] } } }),
-    db.ticket.count({ where: { status: "CLOSED", updatedAt: { gte: todayStart } } }),
-    db.user.count({ where: { updatedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } } }),
   ]);
 
-  // Mocked high-fidelity metrics (in production: from Stripe + EventLog)
-  const metrics = {
-    revenueToday: 2840,
-    revenueTrend: +12.4,
-    leadsContacted: newLeadsToday,
-    demosBooked: 3,
-    dealsClosed: 1,
-    activeTrials: 28,
-    activatedUsers: activeUsers,
-    contentPublished: 2,
-    ticketsResolved,
-    mrr: 84500,
-    mrrTrend: +8.2,
-    churnToday: 0,
-    expansionToday: 1,
-  };
+  const metrics = liveMetrics;
 
   const dailyKPIs = [
     {
