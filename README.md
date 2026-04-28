@@ -1,3 +1,13 @@
+---
+title: Virail
+emoji: 🎬
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
 # AI Video Shorts Creator
 
 > **AI-Based Video Automation System** | Python · Whisper · YOLO · CLIP · FFmpeg  

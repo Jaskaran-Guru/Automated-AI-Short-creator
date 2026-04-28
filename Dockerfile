@@ -9,10 +9,15 @@ RUN apt-get update && apt-get install -y \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
+# Create a non-root user
+RUN useradd -m -u 1000 user
+ENV HOME=/home/user
+ENV PATH=/home/user/.local/bin:$PATH
+
 # Set working directory
 WORKDIR /app
 
-# Copy Python requirements and install
+# Copy and install dependencies as root
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -22,8 +27,8 @@ WORKDIR /app/frontend
 RUN npm install
 WORKDIR /app
 
-# Copy the rest of the application
-COPY . .
+# Copy the rest of the application and set ownership
+COPY --chown=user . .
 
 # Generate Prisma Client
 WORKDIR /app/frontend
@@ -33,6 +38,9 @@ WORKDIR /app
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PORT=7860
+
+# Switch to the non-root user
+USER user
 
 # Expose the port
 EXPOSE 7860
