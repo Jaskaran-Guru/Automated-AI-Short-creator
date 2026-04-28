@@ -3,11 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uuid
 import os
-# Force AI model caches to a local writable directory to avoid permission issues in restricted environments
-_cache_dir = os.path.join("/tmp", ".cache")
+# Force AI model caches to a local writable directory to avoid permission issues
+_base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_cache_dir = os.path.join(_base_dir, ".cache")
 os.environ["XDG_CACHE_HOME"] = _cache_dir
-os.environ["WHISPER_CACHE_DIR"] = os.path.join("/tmp", "whisper")
-os.makedirs(os.environ["XDG_CACHE_HOME"], exist_ok=True)
+os.environ["WHISPER_CACHE_DIR"] = os.path.join(_cache_dir, "whisper")
+os.makedirs(_cache_dir, exist_ok=True)
 os.makedirs(os.environ["WHISPER_CACHE_DIR"], exist_ok=True)
 
 import shutil

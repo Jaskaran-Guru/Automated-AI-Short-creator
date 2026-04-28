@@ -22,8 +22,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 RUN id -u user >/dev/null 2>&1 || useradd -m -u 1000 user
 ENV HOME=/home/user
 ENV PATH=/home/user/.local/bin:$PATH
-ENV XDG_CACHE_HOME=/tmp/.cache
-ENV WHISPER_CACHE_DIR=/tmp/whisper
+ENV XDG_CACHE_HOME=/app/.cache
+ENV WHISPER_CACHE_DIR=/app/.cache/whisper
 ENV PYTHONUNBUFFERED=1
 
 # Set working directory
@@ -41,7 +41,7 @@ WORKDIR /app
 
 # Copy the rest of the application
 COPY --chown=user . .
-RUN chown -R user:user /app
+RUN mkdir -p /app/.cache /app/.cache/whisper && chown -R user:user /app
 
 # Generate Prisma Client
 WORKDIR /app/frontend

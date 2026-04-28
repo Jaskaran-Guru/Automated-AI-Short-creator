@@ -6,6 +6,19 @@ import os
 import torch
 
 # ─────────────────────────────────────────────
+# AI Model Cache Redirection
+# ─────────────────────────────────────────────
+# Force all AI models to use a local writable directory within the app folder.
+# This prevents "Permission denied" errors in restricted environments.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+_local_cache = os.path.join(BASE_DIR, ".cache")
+os.makedirs(_local_cache, exist_ok=True)
+
+os.environ["XDG_CACHE_HOME"] = _local_cache
+os.environ["WHISPER_CACHE_DIR"] = os.path.join(_local_cache, "whisper")
+os.makedirs(os.environ["WHISPER_CACHE_DIR"], exist_ok=True)
+
+# ─────────────────────────────────────────────
 # Device
 # ─────────────────────────────────────────────
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -13,7 +26,6 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 # ─────────────────────────────────────────────
 # Paths
 # ─────────────────────────────────────────────
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMP_DIR = os.path.join(BASE_DIR, ".temp")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 
@@ -22,11 +34,7 @@ OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 # ─────────────────────────────────────────────
 WHISPER_MODEL = "small"          # base | small | medium | large | large-v2
 WHISPER_LANGUAGE = None          # None = auto-detect, or "en", "hi", "es" etc.
-WHISPER_CACHE_DIR = os.path.join("/tmp", "whisper")
-
-# Set XDG_CACHE_HOME to ensure all AI models use a local writable directory
-os.environ["XDG_CACHE_HOME"] = os.path.join("/tmp", ".cache")
-os.makedirs(os.environ["XDG_CACHE_HOME"], exist_ok=True)
+WHISPER_CACHE_DIR = os.environ["WHISPER_CACHE_DIR"]
 
 # ─────────────────────────────────────────────
 # Scene Scoring Weights  (must sum to 1.0)

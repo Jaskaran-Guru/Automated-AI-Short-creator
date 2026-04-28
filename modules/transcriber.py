@@ -8,7 +8,7 @@ import re
 from typing import List, Dict, Optional
 from dataclasses import dataclass
 
-import whisper
+# import whisper (lazy-loaded inside transcribe)
 
 from modules.utils import log, ensure_dir, seconds_to_hms
 import config
@@ -47,6 +47,7 @@ def transcribe(
     -------
     words : list of WordEntry with millisecond-accurate timestamps
     """
+    import whisper
     log.info(f"Loading Whisper model '{model_name}' on {config.DEVICE} …")
     log.info(f"Whisper cache directory: {config.WHISPER_CACHE_DIR}")
     ensure_dir(config.WHISPER_CACHE_DIR)
