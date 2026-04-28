@@ -14,25 +14,25 @@ RUN apt-get update && apt-get install -y \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user
-RUN useradd -m -u 1000 user
+# Create a non-root user (ignore if exists)
+RUN id -u user >/dev/null 2>&1 || useradd -m -u 1000 user
 ENV HOME=/home/user
 ENV PATH=/home/user/.local/bin:$PATH
 
 # Set working directory
 WORKDIR /app
 
-# Copy and install dependencies as root
-COPY requirements.txt .
+# Copy and install Python dependencies
+COPY --chown=user requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy frontend dependencies and install
-COPY frontend/package*.json ./frontend/
+COPY --chown=user frontend/package*.json ./frontend/
 WORKDIR /app/frontend
 RUN npm install
 WORKDIR /app
 
-# Copy the rest of the application and set ownership
+# Copy the rest of the application
 COPY --chown=user . .
 
 # Generate Prisma Client
@@ -50,7 +50,7 @@ USER user
 # Expose the port
 EXPOSE 7860
 
-# Start script
+# Create start script
 RUN echo '#!/bin/bash\n\
 python -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT &\n\
 cd frontend && npm run worker\n\
