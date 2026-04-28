@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "worker": "tsx src/worker.ts",
-    "dev:all": "concurrently \"npm run dev\" \"npm run worker\""
+    "dev:all": "concurrently \"npm run dev\" \"npm run worker\"",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1037.0",
