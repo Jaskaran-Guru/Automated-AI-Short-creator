@@ -12,7 +12,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useUser } from "@clerk/nextjs"
 
-const PricingCard = ({ title, price, features, highlighted = false, isCurrent = false }: any) => (
+const PricingCard = ({ title, price, features, highlighted = false, isCurrent = false, onClick }: any) => (
   <div className={`glass p-8 rounded-3xl flex flex-col h-full card-hover ${highlighted ? 'border-blue-500/50 bg-blue-500/5' : 'border-slate-800'}`}>
     {highlighted && (
       <Badge className="w-fit mb-4 bg-blue-500 text-white border-none">Most Popular</Badge>
@@ -34,6 +34,7 @@ const PricingCard = ({ title, price, features, highlighted = false, isCurrent = 
       variant={isCurrent ? "outline" : (highlighted ? "premium" : "outline")} 
       className={`w-full py-6 rounded-xl font-bold ${isCurrent ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-500 cursor-default" : ""}`}
       disabled={isCurrent}
+      onClick={onClick}
     >
       {isCurrent ? "Current Plan ✓" : "Get Started"}
     </Button>
@@ -79,6 +80,16 @@ export default function LandingPage() {
         .catch(err => console.error("Plan fetch failed"))
     }
   }, [isSignedIn])
+
+  const handlePricingClick = (plan: string) => {
+    // If not signed in, go to signup
+    if (!isSignedIn) {
+      window.location.href = "/sign-up"
+      return
+    }
+    // If signed in, go to dashboard billing to complete checkout
+    window.location.href = "/dashboard/billing"
+  }
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden bg-[#020617]">
       {/* Background Orbs */}
@@ -296,6 +307,7 @@ export default function LandingPage() {
             price="$0" 
             features={["1 video/month", "Watermarked clips", "Standard AI", "720p Export"]} 
             isCurrent={currentPlan.toUpperCase() === "FREE"}
+            onClick={() => handlePricingClick("Free")}
           />
           <PricingCard 
             title="Starter" 
@@ -303,18 +315,21 @@ export default function LandingPage() {
             features={["60 processing minutes / mo", "No Watermark", "Viral Moment Detection", "1080p HD", "Email Support"]} 
             highlighted={true}
             isCurrent={currentPlan.toUpperCase() === "STARTER"}
+            onClick={() => handlePricingClick("Starter")}
           />
           <PricingCard 
             title="Pro" 
             price="$79" 
             features={["300 processing minutes / mo", "Auto Distribution Engine", "Social Media Scheduler", "Analytics Dashboard", "Priority AI"]} 
             isCurrent={currentPlan.toUpperCase() === "PRO"}
+            onClick={() => handlePricingClick("Pro")}
           />
           <PricingCard 
             title="Agency" 
             price="$299" 
             features={["1500 processing minutes / mo", "Multi-Client Mgmt", "White-labeling", "Bulk Export", "Account Manager"]} 
             isCurrent={currentPlan.toUpperCase() === "AGENCY_PRO"}
+            onClick={() => handlePricingClick("Agency")}
           />
         </div>
       </section>
