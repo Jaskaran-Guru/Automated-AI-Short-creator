@@ -35,6 +35,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy frontend dependencies and install
 COPY --chown=user frontend/package*.json ./frontend/
+COPY --chown=user frontend/prisma ./frontend/prisma
 WORKDIR /app/frontend
 RUN npm install
 WORKDIR /app
