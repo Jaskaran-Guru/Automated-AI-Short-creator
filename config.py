@@ -16,7 +16,12 @@ os.makedirs(_local_cache, exist_ok=True)
 
 os.environ["XDG_CACHE_HOME"] = _local_cache
 os.environ["WHISPER_CACHE_DIR"] = os.path.join(_local_cache, "whisper")
+os.environ["YOLO_CONFIG_DIR"] = os.path.join(_local_cache, "ultralytics")
+os.environ["TORCH_HOME"] = os.path.join(_local_cache, "torch")
+
 os.makedirs(os.environ["WHISPER_CACHE_DIR"], exist_ok=True)
+os.makedirs(os.environ["YOLO_CONFIG_DIR"], exist_ok=True)
+os.makedirs(os.environ["TORCH_HOME"], exist_ok=True)
 
 # ─────────────────────────────────────────────
 # Device

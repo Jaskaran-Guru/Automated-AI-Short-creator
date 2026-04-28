@@ -8,8 +8,13 @@ _base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _cache_dir = os.path.join(_base_dir, ".cache")
 os.environ["XDG_CACHE_HOME"] = _cache_dir
 os.environ["WHISPER_CACHE_DIR"] = os.path.join(_cache_dir, "whisper")
+os.environ["YOLO_CONFIG_DIR"] = os.path.join(_cache_dir, "ultralytics")
+os.environ["TORCH_HOME"] = os.path.join(_cache_dir, "torch")
+
 os.makedirs(_cache_dir, exist_ok=True)
 os.makedirs(os.environ["WHISPER_CACHE_DIR"], exist_ok=True)
+os.makedirs(os.environ["YOLO_CONFIG_DIR"], exist_ok=True)
+os.makedirs(os.environ["TORCH_HOME"], exist_ok=True)
 
 import shutil
 import time
