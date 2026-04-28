@@ -33,7 +33,7 @@ export default function Dashboard() {
       const data = await res.json()
       setProjects(data.slice(0, 3)) // Only show recent 3
       
-      const statsRes = await fetch("/api/stats")
+      const statsRes = await fetch(`${BACKEND_URL}/stats`)
       if (statsRes.ok) {
         const statsJson = await statsRes.json()
         setStatsData(statsJson)

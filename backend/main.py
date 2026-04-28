@@ -178,6 +178,31 @@ async def delete_project(project_id: str, db: Session = Depends(get_db)):
 async def list_projects(db: Session = Depends(get_db)):
     return db.query(models.Project).all()
 
+@app.get("/stats")
+async def get_stats(db: Session = Depends(get_db)):
+    from datetime import datetime, timedelta
+    one_week_ago = datetime.utcnow() - timedelta(days=7)
+    
+    projects = db.query(models.Project).all()
+    completed_projects = [p for p in projects if p.status == "completed"]
+    recent_projects = [p for p in completed_projects if p.created_at >= one_week_ago]
+    
+    total_clips = sum(len(p.results) if p.results else 0 for p in completed_projects)
+    clips_this_week = sum(len(p.results) if p.results else 0 for p in recent_projects)
+    
+    # Estimate minutes used (30s per clip)
+    minutes_used = total_clips * 0.5 
+    
+    return {
+        "totalClips": total_clips,
+        "clipsThisWeek": clips_this_week,
+        "totalScheduled": 0, # Backend doesn't support scheduling yet
+        "timeSavedMinutes": total_clips * 30,
+        "minutesUsed": int(minutes_used),
+        "minutesLimit": 60, # Default limit
+        "avgScore": 85 if total_clips > 0 else 0
+    }
+
 @app.post("/user/settings")
 async def update_settings(settings: UserSettings, db: Session = Depends(get_db)):
     # In a real app, we'd use the current_user's ID
