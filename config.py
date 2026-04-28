@@ -22,6 +22,7 @@ OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 # ─────────────────────────────────────────────
 WHISPER_MODEL = "small"          # base | small | medium | large | large-v2
 WHISPER_LANGUAGE = None          # None = auto-detect, or "en", "hi", "es" etc.
+WHISPER_CACHE_DIR = os.path.join(BASE_DIR, ".cache", "whisper")
 
 # ─────────────────────────────────────────────
 # Scene Scoring Weights  (must sum to 1.0)
