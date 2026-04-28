@@ -1,9 +1,7 @@
 services:
   - type: web
-    name: virail-combined-service
-    env: python
-    buildCommand: "./render-combined-build.sh"
-    startCommand: "./render-combined-start.sh"
+    name: virail-combined-docker
+    env: docker
     envVars:
       - key: REDIS_URL
         sync: false
@@ -13,4 +11,5 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
+
 
