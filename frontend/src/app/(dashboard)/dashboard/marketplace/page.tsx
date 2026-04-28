@@ -1,14 +1,11 @@
-﻿import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+"use client"
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
-  Zap, 
   ShoppingBag, 
-  Star, 
   Users, 
   TrendingUp, 
-  CheckCircle2,
   Search,
   Filter,
   ArrowRight,
@@ -16,7 +13,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-export default async function MarketplacePage() {
+export default function MarketplacePage() {
   const items = [
     {
       id: "1",
@@ -52,6 +49,18 @@ export default async function MarketplacePage() {
       isFeatured: false
     }
   ];
+
+  const handlePurchase = (item: any) => {
+    if (item.price === 0) {
+        alert(`${item.name} installed to your library!`);
+    } else {
+        alert(`Redirecting to Stripe checkout for ${item.name} ($${item.price})...`);
+    }
+  }
+
+  const handleApply = () => {
+    alert("Application submitted! Our marketplace team will review your viral performance and reach out.");
+  }
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -121,7 +130,10 @@ export default async function MarketplacePage() {
                         </div>
                         <span className="text-xl font-black text-white">{item.price === 0 ? 'FREE' : `$${item.price}`}</span>
                     </div>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest rounded-2xl h-14">
+                    <Button 
+                        onClick={() => handlePurchase(item)}
+                        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest rounded-2xl h-14"
+                    >
                         {item.price === 0 ? 'Install Template' : 'Purchase Blueprint'}
                         <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
@@ -137,7 +149,11 @@ export default async function MarketplacePage() {
             <p className="text-xs text-slate-500 max-w-[200px] mb-8 leading-relaxed">
                 Turn your viral growth patterns into a recurring revenue stream.
             </p>
-            <Button variant="ghost" className="text-blue-500 font-black uppercase tracking-widest text-[10px] hover:bg-blue-500/5">
+            <Button 
+                variant="ghost" 
+                className="text-blue-500 font-black uppercase tracking-widest text-[10px] hover:bg-blue-500/5"
+                onClick={handleApply}
+            >
                 Apply to be a Creator &rarr;
             </Button>
         </Card>

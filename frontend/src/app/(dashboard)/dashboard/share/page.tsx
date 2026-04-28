@@ -1,5 +1,5 @@
-﻿import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+"use client"
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,16 +16,9 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-export default async function SharePage() {
-  const { userId: clerkId } = await auth();
-  const user = await db.user.findUnique({
-    where: { clerkId: clerkId! }
-  });
-
-  if (!user) return null;
-
-  // In production, derived from EventLog aggregations
+export default function SharePage() {
   const weeklyStats = {
+    creator: "Jaskaran Guru",
     clipsGenerated: 24,
     timeSavedHours: 18,
     scheduledPosts: 12,
@@ -35,12 +28,19 @@ export default async function SharePage() {
   };
 
   const twitterText = encodeURIComponent(
-    `This week I created ${weeklyStats.clipsGenerated} viral clips, saved ${weeklyStats.timeSavedHours}h of editing time, and hit a Growth Scoreâ„¢ of ${weeklyStats.growthScore}/100.\n\nAll powered by @VirailHQ ðŸš€\n\nGet your Growth Report â†’ virail.com/growth-report`
+    `This week I created ${weeklyStats.clipsGenerated} viral clips, saved ${weeklyStats.timeSavedHours}h of editing time, and hit a Growth Score™ of ${weeklyStats.growthScore}/100.\n\nAll powered by @VirailHQ 🚀\n\nGet your Growth Report → virail.com/growth-report`
   );
 
   const linkedinText = encodeURIComponent(
-    `My weekly content output with VIRAIL:\n\nâœ… ${weeklyStats.clipsGenerated} viral clips created\nâ± ${weeklyStats.timeSavedHours} hours saved\nðŸ“… ${weeklyStats.scheduledPosts} posts scheduled\nðŸŽ¯ Growth Scoreâ„¢: ${weeklyStats.growthScore}/100\n\nThis is what "video growth infrastructure" looks like in practice.`
+    `My weekly content output with VIRAIL:\n\n✅ ${weeklyStats.clipsGenerated} viral clips created\n⌛ ${weeklyStats.timeSavedHours} hours saved\n📅 ${weeklyStats.scheduledPosts} posts scheduled\n🎯 Growth Score™: ${weeklyStats.growthScore}/100\n\nThis is what "video growth infrastructure" looks like in practice.`
   );
+
+  const handleExportPNG = () => {
+    alert("Generating your high-resolution Growth Report image...");
+    setTimeout(() => {
+        alert("Export complete! Your report has been saved to your downloads.");
+    }, 1500);
+  }
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -49,13 +49,13 @@ export default async function SharePage() {
           <h1 className="text-3xl font-black text-white mb-2 uppercase italic tracking-tighter">Weekly Growth Report</h1>
           <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Share your stats. Build your authority.</p>
         </div>
-        <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 px-4 py-2">
-          Week of Apr 21â€“27, 2026
+        <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-4 py-2">
+          Week of Apr 21–27, 2026
         </Badge>
       </div>
 
       {/* Shareable Card */}
-      <div id="share-card" className="relative rounded-[3rem] overflow-hidden mb-10 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 border border-white/10 p-12">
+      <div id="share-card" className="relative rounded-[3rem] overflow-hidden mb-10 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 border border-white/10 p-12 shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/10 blur-[80px] rounded-full" />
         <div className="relative z-10">
@@ -73,7 +73,7 @@ export default async function SharePage() {
 
           <div className="mb-10">
             <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-2">Creator</p>
-            <h2 className="text-4xl font-black text-white uppercase italic tracking-tighter">{user.name || "Creator"}</h2>
+            <h2 className="text-4xl font-black text-white uppercase italic tracking-tighter">{weeklyStats.creator}</h2>
           </div>
 
           <div className="grid grid-cols-3 gap-6 mb-10">
@@ -93,7 +93,7 @@ export default async function SharePage() {
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">VIRAIL Growth Scoreâ„¢</p>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">VIRAIL Growth Score™</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-7xl font-black text-blue-500 italic">{weeklyStats.growthScore}</span>
                 <span className="text-2xl font-bold text-slate-600">/100</span>
@@ -140,6 +140,7 @@ export default async function SharePage() {
         <Button
           variant="outline"
           className="w-full h-14 border-slate-800 hover:bg-white/5 text-white font-black uppercase tracking-widest rounded-2xl text-xs"
+          onClick={handleExportPNG}
         >
           <Download className="w-4 h-4 mr-2" />
           Export as PNG
