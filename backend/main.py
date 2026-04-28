@@ -30,6 +30,10 @@ database.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="AI Shorts Creator API")
 
+@app.get("/")
+def home():
+    return {"status": "healthy", "message": "Virail AI API is running", "worker": "active"}
+
 # Mount output directory as static files
 app.mount("/static", StaticFiles(directory="output"), name="static")
 
