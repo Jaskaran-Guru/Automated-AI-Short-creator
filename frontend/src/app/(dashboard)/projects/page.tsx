@@ -40,7 +40,7 @@ export default function ProjectsPage() {
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this project?")) {
       try {
-        const response = await fetch(`${BACKEND_URL}/project/${id}`, {
+        const response = await fetch(`${BACKEND_URL}/projects/${id}`, {
           method: 'DELETE',
         });
         if (response.ok) {

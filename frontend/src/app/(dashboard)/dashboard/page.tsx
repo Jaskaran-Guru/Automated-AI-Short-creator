@@ -54,7 +54,7 @@ export default function Dashboard() {
     e.stopPropagation();
     if (confirm("Delete this project?")) {
       try {
-        await fetch(`${BACKEND_URL}/project/${id}`, { method: 'DELETE' });
+        await fetch(`${BACKEND_URL}/projects/${id}`, { method: 'DELETE' });
         setProjects(prev => prev.filter(p => p.id !== id));
       } catch (err) {
         console.error(err);

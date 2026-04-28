@@ -12,8 +12,11 @@ import {
   Sparkles
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 
 export default function MarketplacePage() {
+  const router = useRouter();
+
   const items = [
     {
       id: "1",
@@ -51,15 +54,12 @@ export default function MarketplacePage() {
   ];
 
   const handlePurchase = (item: any) => {
-    if (item.price === 0) {
-        alert(`${item.name} installed to your library!`);
-    } else {
-        alert(`Redirecting to Stripe checkout for ${item.name} ($${item.price})...`);
-    }
+    // Redirect to checkout or details page
+    router.push(`/dashboard/marketplace/item/${item.id}`);
   }
 
   const handleApply = () => {
-    alert("Application submitted! Our marketplace team will review your viral performance and reach out.");
+    router.push("/dashboard/marketplace/apply");
   }
 
   return (
