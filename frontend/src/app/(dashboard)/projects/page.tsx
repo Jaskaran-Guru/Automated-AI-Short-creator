@@ -1,12 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Play, Trash2, Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react"
+import { Play, Trash2, Clock, CheckCircle2, AlertCircle, Loader2, Download } from "lucide-react"
 import Link from "next/link"
-import { getProjects, BACKEND_URL } from "@/lib/api"
+import { getProjects, BACKEND_URL, deleteProject } from "@/lib/api"
 
 interface Project {
   id: string
@@ -21,20 +21,39 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    async function fetchProjects() {
-      try {
-        const response = await fetch(`${BACKEND_URL}/projects`)
-        const data = await response.json()
-        setProjects(data)
-      } catch (error) {
-        console.error("Failed to fetch projects:", error)
-      } finally {
-        setIsLoading(false)
-      }
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/projects`)
+      const data = await response.json()
+      setProjects(data)
+    } catch (error) {
+      console.error("Failed to fetch projects:", error)
+    } finally {
+      setIsLoading(false)
     }
+  }
+
+  useEffect(() => {
     fetchProjects()
   }, [])
+
+  const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this project?")) {
+      try {
+        const response = await fetch(`${BACKEND_URL}/project/${id}`, {
+          method: 'DELETE',
+        });
+        if (response.ok) {
+          setProjects(prev => prev.filter(p => p.id !== id));
+        } else {
+          alert("Failed to delete project from backend.");
+        }
+      } catch (err) {
+        console.error("Delete error:", err);
+        alert("Failed to delete project.");
+      }
+    }
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -68,7 +87,7 @@ export default function ProjectsPage() {
             <p>Loading projects...</p>
           </div>
         ) : projects.length === 0 ? (
-          <Card className="bg-slate-900/50 border-slate-800">
+          <Card className="bg-slate-900/50 border-slate-800 rounded-3xl">
             <CardContent className="p-6 text-center text-slate-500 py-20">
               <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Play className="w-8 h-8 text-slate-600" />
@@ -82,10 +101,9 @@ export default function ProjectsPage() {
           </Card>
         ) : (
           projects.map((project) => (
-            <Card key={project.id} className="bg-slate-900/40 border-slate-800 hover:border-slate-700 transition-all group overflow-hidden glass">
+            <Card key={project.id} className="bg-slate-900/40 border-slate-800 hover:border-slate-700 transition-all group overflow-hidden glass rounded-3xl">
               <CardContent className="p-0">
                 <div className="flex flex-col md:flex-row items-center">
-                  {/* Mock Thumbnail */}
                   <div className="w-full md:w-48 h-32 bg-slate-800 relative overflow-hidden flex-shrink-0">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20"></div>
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -97,7 +115,7 @@ export default function ProjectsPage() {
                     <div className="space-y-1">
                       <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">{project.name}</h3>
                       <div className="flex items-center gap-4 text-sm text-slate-500">
-                        <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> 2 hours ago</span>
+                        <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {project.created_at}</span>
                         <span className="flex items-center gap-1">{getStatusBadge(project.status)}</span>
                       </div>
                     </div>
@@ -112,7 +130,13 @@ export default function ProjectsPage() {
                           {Math.round(project.progress * 100)}% Complete
                         </Button>
                       )}
-                      <Button variant="ghost" size="icon" className="text-slate-500 hover:text-red-400 hover:bg-red-400/10">
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-slate-500 hover:text-red-400 hover:bg-red-400/10"
+                        onClick={() => handleDelete(project.id)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>

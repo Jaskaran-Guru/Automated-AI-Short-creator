@@ -27,7 +27,7 @@ export default function ReferralsPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/stats"); // Reuse stats to get user info or add user info to stats
+        const res = await fetch("/api/stats"); 
         if (res.ok) {
           const data = await res.json();
           setUserData(data);
@@ -46,10 +46,24 @@ export default function ReferralsPage() {
     : "Loading...";
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(referralLink);
-    setCopied(true);
-    posthog.capture('copied_referral_link');
-    setTimeout(() => setCopied(false), 2000);
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(referralLink);
+      setCopied(true);
+      if (posthog) posthog.capture('copied_referral_link');
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleShare = () => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      navigator.share({
+        title: 'Join Virail AI',
+        text: 'Create viral shorts with AI!',
+        url: referralLink
+      }).catch(() => handleCopy());
+    } else {
+      handleCopy();
+    }
   };
 
   return (
@@ -59,7 +73,7 @@ export default function ReferralsPage() {
            Referral Program
         </Badge>
         <h1 className="text-5xl font-black text-white tracking-tighter uppercase letter-spacing-widest">
-          Grow Together. <span className="text-blue-500">Earn Together.</span>
+           Grow Together. <span className="text-blue-500">Earn Together.</span>
         </h1>
         <p className="text-slate-500 font-medium max-w-2xl mx-auto">
           Invite your friends to Virail and earn free processing minutes for every successful signup. Your friends get a 20% discount on their first month.
@@ -122,7 +136,11 @@ export default function ReferralsPage() {
                  </div>
                  <h4 className="text-lg font-bold text-white uppercase mb-2">Share on Social</h4>
                  <p className="text-slate-500 text-sm mb-6">Promote your link on TikTok or Reels and earn unlimited credits as your audience grows.</p>
-                 <Button variant="outline" className="w-full rounded-xl border-slate-800 font-bold">
+                 <Button 
+                    variant="outline" 
+                    className="w-full rounded-xl border-slate-800 font-bold"
+                    onClick={handleShare}
+                 >
                     <Share2 className="w-4 h-4 mr-2" /> Share Post
                  </Button>
               </Card>
@@ -132,7 +150,7 @@ export default function ReferralsPage() {
                  </div>
                  <h4 className="text-lg font-bold text-white uppercase mb-2">Earn 30m / Invite</h4>
                  <p className="text-slate-500 text-sm mb-6">Get 30 bonus processing minutes for every friend who signs up using your link.</p>
-                 <Button variant="outline" className="w-full rounded-xl border-slate-800 font-bold">
+                 <Button variant="outline" className="w-full rounded-xl border-slate-800 font-bold" onClick={() => alert("Invite friends to earn processing minutes!")}>
                     Learn More
                  </Button>
               </Card>
@@ -172,7 +190,10 @@ export default function ReferralsPage() {
               <div className="relative z-10">
                  <h3 className="text-2xl font-black uppercase mb-4 leading-tight">Become an Ambassador</h3>
                  <p className="text-blue-100 text-sm mb-8 opacity-90">Are you a creator with 10k+ followers? Join our official partner program for revenue share.</p>
-                 <Button className="w-full bg-white text-blue-600 hover:bg-blue-50 rounded-2xl py-6 font-black uppercase tracking-widest text-xs">
+                 <Button 
+                    className="w-full bg-white text-blue-600 hover:bg-blue-50 rounded-2xl py-6 font-black uppercase tracking-widest text-xs"
+                    onClick={() => alert("Application submitted! Our team will reach out shortly.")}
+                 >
                     Apply Now <ArrowRight className="w-4 h-4 ml-2" />
                  </Button>
               </div>
