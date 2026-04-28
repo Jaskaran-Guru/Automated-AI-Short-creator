@@ -35,6 +35,11 @@ OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 # ─────────────────────────────────────────────
 WHISPER_MODEL = "small"          # base | small | medium | large | large-v2
 WHISPER_LANGUAGE = None          # None = auto-detect, or "en", "hi", "es" etc.
+WHISPER_CACHE_DIR = os.path.join(BASE_DIR, ".cache", "whisper")
+
+# Set XDG_CACHE_HOME to ensure all AI models use a local writable directory
+os.environ["XDG_CACHE_HOME"] = os.path.join(BASE_DIR, ".cache")
+os.makedirs(os.environ["XDG_CACHE_HOME"], exist_ok=True)
 
 # ─────────────────────────────────────────────
 # Scene Scoring Weights  (must sum to 1.0)

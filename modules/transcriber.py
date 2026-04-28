@@ -48,6 +48,7 @@ def transcribe(
     words : list of WordEntry with millisecond-accurate timestamps
     """
     log.info(f"Loading Whisper model '{model_name}' on {config.DEVICE} …")
+    log.info(f"Whisper cache directory: {config.WHISPER_CACHE_DIR}")
     ensure_dir(config.WHISPER_CACHE_DIR)
     model = whisper.load_model(model_name, device=config.DEVICE, download_root=config.WHISPER_CACHE_DIR)
 
