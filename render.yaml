@@ -1,0 +1,15 @@
+services:
+  - type: worker
+    name: virail-video-worker
+    env: node
+    buildCommand: "./render-worker-build.sh"
+    startCommand: "export PATH=$PATH:/opt/render/project/src/.render/ffmpeg && cd frontend && npm run worker"
+    envVars:
+      - key: REDIS_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
