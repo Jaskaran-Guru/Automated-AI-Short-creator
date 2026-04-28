@@ -42,7 +42,9 @@ WORKDIR /app
 
 # Copy the rest of the application
 COPY --chown=user . .
-RUN mkdir -p /app/.cache /app/.cache/whisper && chown -R user:user /app
+RUN mkdir -p /app/.cache /app/.cache/whisper /app/output /app/temp_inputs && \
+    chown -R user:user /app/.cache /app/output /app/temp_inputs && \
+    chown user:user /app
 
 # Generate Prisma Client
 WORKDIR /app/frontend
