@@ -4,10 +4,9 @@ from pydantic import BaseModel
 import uuid
 import os
 # Force AI model caches to a local writable directory to avoid permission issues in restricted environments
-_base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_cache_dir = os.path.join(_base_dir, ".cache")
+_cache_dir = os.path.join("/tmp", ".cache")
 os.environ["XDG_CACHE_HOME"] = _cache_dir
-os.environ["WHISPER_CACHE_DIR"] = os.path.join(_cache_dir, "whisper")
+os.environ["WHISPER_CACHE_DIR"] = os.path.join("/tmp", "whisper")
 os.makedirs(os.environ["XDG_CACHE_HOME"], exist_ok=True)
 os.makedirs(os.environ["WHISPER_CACHE_DIR"], exist_ok=True)
 

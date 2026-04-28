@@ -22,8 +22,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 RUN id -u user >/dev/null 2>&1 || useradd -m -u 1000 user
 ENV HOME=/home/user
 ENV PATH=/home/user/.local/bin:$PATH
-ENV XDG_CACHE_HOME=/app/.cache
-ENV WHISPER_CACHE_DIR=/app/.cache/whisper
+ENV XDG_CACHE_HOME=/tmp/.cache
+ENV WHISPER_CACHE_DIR=/tmp/whisper
 ENV PYTHONUNBUFFERED=1
 
 # Set working directory
@@ -47,7 +47,6 @@ RUN chown -R user:user /app
 WORKDIR /app/frontend
 RUN npx prisma generate
 WORKDIR /app
-RUN mkdir -p /app/.cache && chown -R user:user /app/.cache
 
 # Set environment variables
 ENV PORT=7860
