@@ -1,7 +1,8 @@
 import { Sidebar } from "@/components/dashboard/Sidebar"
-import { Bell, Search } from "lucide-react"
+import { Search } from "lucide-react"
 import { UserButton } from "@clerk/nextjs"
 import { PageWrapper } from "@/components/dashboard/PageWrapper"
+import { Notifications } from "@/components/dashboard/Notifications"
 
 export default function DashboardLayout({
   children,
@@ -22,10 +23,7 @@ export default function DashboardLayout({
             />
           </div>
           <div className="flex items-center gap-6 text-slate-400">
-            <button className="hover:text-white transition-colors relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-blue-500 rounded-full border-2 border-slate-950"></span>
-            </button>
+            <Notifications />
             <UserButton />
           </div>
         </header>
