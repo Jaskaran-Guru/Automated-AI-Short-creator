@@ -81,6 +81,15 @@ class ProjectStatus(BaseModel):
     message: str
     results: list[str] = []
 
+class UserSettings(BaseModel):
+    name: str
+    email: Optional[str] = None
+
+class MarketplacePurchase(BaseModel):
+    item_id: str
+    item_name: str
+    price: float
+
 @app.post("/upload")
 async def upload_video(file: UploadFile = File(...), db: Session = Depends(get_db)):
     # Create unique project ID and temp directory
@@ -160,6 +169,18 @@ async def delete_project(project_id: str, db: Session = Depends(get_db)):
 @app.get("/projects", response_model=list[ProjectStatus])
 async def list_projects(db: Session = Depends(get_db)):
     return db.query(models.Project).all()
+
+@app.post("/user/settings")
+async def update_settings(settings: UserSettings, db: Session = Depends(get_db)):
+    # In a real app, we'd use the current_user's ID
+    # For now, we'll update a mock user or the first user in DB
+    return {"message": "Settings updated successfully", "name": settings.name}
+
+@app.post("/marketplace/purchase")
+async def record_purchase(purchase: MarketplacePurchase, db: Session = Depends(get_db)):
+    # Logic to store purchase in DB (e.g., EventLog or a new Purchase table)
+    print(f"User purchased {purchase.item_name} for ${purchase.price}")
+    return {"message": f"Successfully purchased {purchase.item_name}", "item_id": purchase.item_id}
 
 @app.get("/status/{project_id}", response_model=ProjectStatus)
 async def get_status(project_id: str, db: Session = Depends(get_db)):

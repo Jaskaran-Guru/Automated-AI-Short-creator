@@ -65,6 +65,25 @@ export default function ItemDetailPage() {
 
   const item = items[id as string] || items["1"];
 
+  const handleCheckout = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/marketplace/purchase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          item_id: id,
+          item_name: item.name,
+          price: item.price
+        })
+      });
+      if (res.ok) {
+        alert(`Successfully purchased ${item.name}! It is now available in your library.`);
+      }
+    } catch (err) {
+      console.error("Purchase failed");
+    }
+  }
+
   return (
     <div className="max-w-5xl mx-auto p-8 space-y-12">
       <Button 
@@ -147,7 +166,7 @@ export default function ItemDetailPage() {
 
               <Button 
                 className="w-full h-16 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-blue-500/20"
-                onClick={() => alert("Checkout system coming soon! You have been added to the waitlist.")}
+                onClick={handleCheckout}
               >
                 <CreditCard className="w-5 h-5 mr-3" />
                 {item.price === 0 ? 'Install Template' : 'Checkout Now'}

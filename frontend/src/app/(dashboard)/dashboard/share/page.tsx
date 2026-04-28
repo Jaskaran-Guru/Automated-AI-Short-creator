@@ -1,23 +1,22 @@
 "use client"
 
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  Share2,
   Zap,
   TrendingUp,
   Twitter,
   Linkedin,
   Download,
-  Copy,
-  BarChart3,
-  Clock,
-  Target
+  RefreshCcw,
+  Loader2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function SharePage() {
-  const weeklyStats = {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [weeklyStats, setWeeklyStats] = useState({
     creator: "Jaskaran Guru",
     clipsGenerated: 24,
     timeSavedHours: 18,
@@ -25,6 +24,19 @@ export default function SharePage() {
     growthScore: 84,
     reachEst: 42000,
     streak: 7
+  });
+
+  const handleGenerate = () => {
+    setIsGenerating(true);
+    // Mocking report generation
+    setTimeout(() => {
+        setWeeklyStats(prev => ({
+            ...prev,
+            clipsGenerated: prev.clipsGenerated + 2,
+            growthScore: Math.min(100, prev.growthScore + 1)
+        }));
+        setIsGenerating(false);
+    }, 2000);
   };
 
   const twitterText = encodeURIComponent(
@@ -43,19 +55,30 @@ export default function SharePage() {
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+    <div className="p-8 max-w-5xl mx-auto space-y-10">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-black text-white mb-2 uppercase italic tracking-tighter">Weekly Growth Report</h1>
           <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Share your stats. Build your authority.</p>
         </div>
-        <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-4 py-2">
-          Week of Apr 21–27, 2026
-        </Badge>
+        <div className="flex gap-4">
+            <Button 
+                variant="outline" 
+                className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 rounded-xl"
+                onClick={handleGenerate}
+                disabled={isGenerating}
+            >
+                {isGenerating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCcw className="w-4 h-4 mr-2" />}
+                Generate New Report
+            </Button>
+            <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-4 py-2">
+              Week of Apr 21–27, 2026
+            </Badge>
+        </div>
       </div>
 
       {/* Shareable Card */}
-      <div id="share-card" className="relative rounded-[3rem] overflow-hidden mb-10 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 border border-white/10 p-12 shadow-2xl">
+      <div id="share-card" className="relative rounded-[3rem] overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 border border-white/10 p-12 shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/10 blur-[80px] rounded-full" />
         <div className="relative z-10">
