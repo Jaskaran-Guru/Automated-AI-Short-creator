@@ -48,18 +48,17 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED=1
 ENV PORT=7860
 
-# Switch to the non-root user
-USER user
-
 # Expose the port
 EXPOSE 7860
 
-# Create start script
+# Create start script (as root)
 RUN echo '#!/bin/bash\n\
 python -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT &\n\
 cd frontend && npm run worker\n\
-' > /app/start.sh
-RUN chmod +x /app/start.sh
+' > /app/start.sh && chmod +x /app/start.sh
+
+# Switch to the non-root user at the very end
+USER user
 
 # Start the application
 CMD ["/app/start.sh"]
