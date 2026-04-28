@@ -47,6 +47,7 @@ WORKDIR /app
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PORT=7860
+ENV PYTHONPATH=/app/backend
 
 # Expose the port
 EXPOSE 7860
