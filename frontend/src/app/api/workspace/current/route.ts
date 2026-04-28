@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getCurrentWorkspace } from "@/lib/agency-context";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const workspace = await getCurrentWorkspace();
