@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Play, Trash2, Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
-import { getProjects } from "@/lib/api"
+import { getProjects, BACKEND_URL } from "@/lib/api"
 
 interface Project {
   id: string
@@ -24,7 +24,7 @@ export default function ProjectsPage() {
   useEffect(() => {
     async function fetchProjects() {
       try {
-        const response = await fetch('http://localhost:8000/projects')
+        const response = await fetch(`${BACKEND_URL}/projects`)
         const data = await response.json()
         setProjects(data)
       } catch (error) {

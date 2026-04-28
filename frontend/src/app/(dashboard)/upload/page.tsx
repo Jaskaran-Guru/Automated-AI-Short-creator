@@ -3,11 +3,11 @@
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { UploadCloud, Settings, Sparkles, Video, CheckCircle2, AlertCircle } from "lucide-react"
+import { UploadCloud, Settings, Sparkles, Video, CheckCircle2, AlertCircle, Share2, Image as ImageIcon, Download } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { uploadVideoToBackend, startProcessing, getProjectStatus } from "@/lib/api"
+import { uploadVideoToBackend, startProcessing, getProjectStatus, BACKEND_URL } from "@/lib/api"
 import { Badge } from "@/components/ui/badge"
 
 const steps = ["Upload Video", "Shorts Settings", "AI Processing", "Review Shorts"]
@@ -298,21 +298,56 @@ function UploadFlowContent() {
                     </div>
                     <div className="aspect-[9/16] relative bg-slate-900 rounded-lg mb-4 overflow-hidden group/video">
                       <video 
-                        src={`http://localhost:8000/static/${backendId}/${videoUrl.split('/').pop()}`}
+                        id={`video-${i}`}
+                        src={`${BACKEND_URL}/static/${backendId}/${videoUrl.split('/').pop()}`}
                         className="absolute inset-0 w-full h-full object-cover"
                         controls
                       />
                     </div>
                     <h3 className="font-semibold text-white mb-4 line-clamp-2">Viral Clip #{i+1}</h3>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <a 
-                        href={`http://localhost:8000/static/${backendId}/${videoUrl.split('/').pop()}`} 
+                        href={`${BACKEND_URL}/static/${backendId}/${videoUrl.split('/').pop()}`} 
                         download 
                         className="flex-1"
                       >
-                        <Button variant="secondary" className="w-full text-xs h-8">Download</Button>
+                        <Button variant="secondary" className="w-full text-[10px] h-8 px-1">
+                          <Download className="w-3 h-3 mr-1" /> Download
+                        </Button>
                       </a>
-                      <Button variant="outline" className="flex-1 text-xs h-8">Edit Clip</Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        className="flex-1 text-[10px] h-8 px-1"
+                        onClick={() => {
+                          const url = `${window.location.origin}/editor/${backendId}?video=${videoUrl.split('/').pop()}`;
+                          navigator.clipboard.writeText(url);
+                          alert("Share link copied to clipboard!");
+                        }}
+                      >
+                        <Share2 className="w-3 h-3 mr-1" /> Share
+                      </Button>
+
+                      <Button 
+                        variant="outline" 
+                        className="flex-1 text-[10px] h-8 px-1"
+                        onClick={() => {
+                          const video = document.getElementById(`video-${i}`) as HTMLVideoElement;
+                          const canvas = document.createElement("canvas");
+                          canvas.width = video.videoWidth;
+                          canvas.height = video.videoHeight;
+                          const ctx = canvas.getContext("2d");
+                          if (ctx) {
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            const link = document.createElement("a");
+                            link.download = `clip-frame-${i+1}.png`;
+                            link.href = canvas.toDataURL("image/png");
+                            link.click();
+                          }
+                        }}
+                      >
+                        <ImageIcon className="w-3 h-3 mr-1" /> PNG
+                      </Button>
                     </div>
                   </div>
                 ))}

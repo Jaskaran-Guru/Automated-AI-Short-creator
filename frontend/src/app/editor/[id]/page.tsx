@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react"
 import { useEditorStore } from "@/store/useEditorStore"
 import { Button } from "@/components/ui/button"
-import { Play, Pause, SkipBack, SkipForward, Type, Scissors, Wand2, Download, Check, Settings2, LayoutTemplate, Loader2 } from "lucide-react"
-import { getProjectStatus } from "@/lib/api"
+import { Play, Pause, SkipBack, SkipForward, Type, Scissors, Wand2, Download, Check, Settings2, LayoutTemplate, Loader2, Share2, Image as ImageIcon } from "lucide-react"
+import { getProjectStatus, BACKEND_URL } from "@/lib/api"
 
 interface Project {
   id: string
@@ -44,7 +44,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
   }
 
   const videoUrl = project?.results && project.results.length > 0 
-    ? `http://localhost:8000/static/${project.id}/${project.results[0].split('/').pop()}`
+    ? `${BACKEND_URL}/static/${project.id}/${project.results[0].split('/').pop()}`
     : "https://images.unsplash.com/photo-1554151228-14d9def656e4?q=80&w=600&h=1066&fit=crop"
 
   return (
@@ -58,14 +58,43 @@ export default function EditorPage({ params }: { params: { id: string } }) {
           <h1 className="text-sm font-semibold text-white">Project: {project?.name || "Untitled Project"}</h1>
           <span className="px-2 py-1 bg-slate-800 text-slate-400 text-xs rounded-md border border-slate-700">Auto-saved 2m ago</span>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="h-9">
-            <Settings2 className="w-4 h-4 mr-2" /> Settings
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-9"
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href);
+              alert("Project link copied to clipboard!");
+            }}
+          >
+            <Share2 className="w-4 h-4 mr-2" /> Share
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-9"
+            onClick={() => {
+              const video = document.querySelector("video") as HTMLVideoElement;
+              if (video) {
+                const canvas = document.createElement("canvas");
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext("2d");
+                if (ctx) {
+                  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                  const link = document.createElement("a");
+                  link.download = `frame-${project?.id}.png`;
+                  link.href = canvas.toDataURL("image/png");
+                  link.click();
+                }
+              }
+            }}
+          >
+            <ImageIcon className="w-4 h-4 mr-2" /> PNG
           </Button>
           <Button variant="premium" size="sm" className="h-9 px-6 shadow-lg shadow-purple-500/20">
-            <Download className="w-4 h-4 mr-2" /> Export
+            <Download className="w-4 h-4 mr-2" /> Export Video
           </Button>
-        </div>
       </header>
 
       {/* Main Workspace */}
