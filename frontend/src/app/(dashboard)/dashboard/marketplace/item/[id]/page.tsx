@@ -14,6 +14,7 @@ import {
   CreditCard
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { BACKEND_URL } from "@/lib/api";
 
 export default function ItemDetailPage() {
   const params = useParams();
