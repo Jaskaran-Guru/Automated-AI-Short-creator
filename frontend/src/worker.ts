@@ -1,5 +1,4 @@
 import { Worker } from "bullmq";
-import http from "http";
 import IORedis from "ioredis";
 import { db } from "./lib/prisma";
 import { extractAudio, cutClip, getVideoDuration } from "./lib/video-processor";
@@ -223,13 +222,4 @@ setInterval(processScheduledPosts, 60000);
 process.on("SIGINT", async () => {
   await worker.close();
   process.exit(0);
-});
-
-// Dummy HTTP server to satisfy Render's Web Service port binding requirement
-const PORT = process.env.PORT || 10000;
-http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Worker is running and healthy!\n');
-}).listen(PORT, () => {
-  console.log(`Dummy health check server listening on port ${PORT}`);
 });

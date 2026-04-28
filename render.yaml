@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: virail-video-worker
-    env: node
-    buildCommand: "./render-worker-build.sh"
-    startCommand: "export PATH=$PATH:/opt/render/project/src/.render/ffmpeg && cd frontend && npm run worker"
+    name: virail-combined-service
+    env: python
+    buildCommand: "./render-combined-build.sh"
+    startCommand: "./render-combined-start.sh"
     envVars:
       - key: REDIS_URL
         sync: false
@@ -13,3 +13,4 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
+
