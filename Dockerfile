@@ -38,6 +38,7 @@ WORKDIR /app
 
 # Copy the rest of the application
 COPY --chown=user . .
+RUN chown -R user:user /app
 
 # Generate Prisma Client
 WORKDIR /app/frontend
