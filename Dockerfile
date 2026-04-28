@@ -32,10 +32,10 @@ WORKDIR /app
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV PORT=8000
+ENV PORT=7860
 
 # Expose the port
-EXPOSE 8000
+EXPOSE 7860
 
 # Start script
 RUN echo '#!/bin/bash\n\
