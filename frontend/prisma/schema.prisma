@@ -104,6 +104,7 @@ model User {
   // Phase 8 Category Dominance
   growthScores     GrowthScoreHistory[]
   marketplaceItems MarketplaceItem[] @relation("MarketplaceCreator")
+  marketplacePurchases MarketplacePurchase[]
 }
 
 model Workspace {
@@ -280,6 +281,18 @@ model Report {
   data        Json
   shareToken  String?  @unique
   createdAt   DateTime @default(now())
+}
+
+model MarketplacePurchase {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  itemId    String
+  itemName  String
+  price     Float
+  createdAt DateTime @default(now())
+
+  @@unique([userId, itemId])
 }
 
 model Subscription {

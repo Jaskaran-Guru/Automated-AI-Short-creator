@@ -7,18 +7,37 @@ import { Loader2, CheckCircle2 } from "lucide-react"
 import { BACKEND_URL } from "@/lib/api"
 
 export default function SettingsPage() {
-  const [name, setName] = useState("Alex")
-  const [email, setEmail] = useState("alex@example.com")
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
   const [isSaving, setIsSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/user/settings')
+        if (res.ok) {
+          const data = await res.json()
+          setName(data.name || "")
+          setEmail(data.email || "")
+        }
+      } catch (err) {
+        console.error("Failed to fetch settings")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchUser()
+  }, [])
 
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      const res = await fetch(`${BACKEND_URL}/user/settings`, {
+      const res = await fetch('/api/user/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email })
+        body: JSON.stringify({ name })
       })
       if (res.ok) {
         setSaved(true)
@@ -29,6 +48,10 @@ export default function SettingsPage() {
     } finally {
       setIsSaving(false)
     }
+  }
+
+  if (isLoading) {
+    return <div className="p-8 flex items-center justify-center min-h-[400px]"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>
   }
 
   return (

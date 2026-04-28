@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { toPng } from "html-to-image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 export default function SharePage() {
+  const reportRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [weeklyStats, setWeeklyStats] = useState({
     creator: "Jaskaran Guru",
@@ -26,17 +28,19 @@ export default function SharePage() {
     streak: 7
   });
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setIsGenerating(true);
-    // Mocking report generation
-    setTimeout(() => {
-        setWeeklyStats(prev => ({
-            ...prev,
-            clipsGenerated: prev.clipsGenerated + 2,
-            growthScore: Math.min(100, prev.growthScore + 1)
-        }));
-        setIsGenerating(false);
-    }, 2000);
+    try {
+      const res = await fetch('/api/reports/generate', { method: 'POST' });
+      if (res.ok) {
+        alert("New report generated successfully!");
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error("Failed to generate report");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const twitterText = encodeURIComponent(
@@ -47,12 +51,20 @@ export default function SharePage() {
     `My weekly content output with VIRAIL:\n\n✅ ${weeklyStats.clipsGenerated} viral clips created\n⌛ ${weeklyStats.timeSavedHours} hours saved\n📅 ${weeklyStats.scheduledPosts} posts scheduled\n🎯 Growth Score™: ${weeklyStats.growthScore}/100\n\nThis is what "video growth infrastructure" looks like in practice.`
   );
 
-  const handleExportPNG = () => {
-    alert("Generating your high-resolution Growth Report image...");
-    setTimeout(() => {
-        alert("Export complete! Your report has been saved to your downloads.");
-    }, 1500);
-  }
+  const handleExportPNG = async () => {
+    if (!reportRef.current) return;
+    
+    try {
+      const dataUrl = await toPng(reportRef.current, { cacheBust: true, backgroundColor: '#020617' });
+      const link = document.createElement('a');
+      link.download = `virail-growth-report-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to export image', err);
+      alert("Failed to export image. Please try again.");
+    }
+  };
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-10">
@@ -78,7 +90,7 @@ export default function SharePage() {
       </div>
 
       {/* Shareable Card */}
-      <div id="share-card" className="relative rounded-[3rem] overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 border border-white/10 p-12 shadow-2xl">
+      <div ref={reportRef} id="share-card" className="relative rounded-[3rem] overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 border border-white/10 p-12 shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/10 blur-[80px] rounded-full" />
         <div className="relative z-10">

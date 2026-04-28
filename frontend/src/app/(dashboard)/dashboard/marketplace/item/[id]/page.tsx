@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,26 @@ export default function ItemDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id;
+  const [isPurchased, setIsPurchased] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkPurchase = async () => {
+      try {
+        const res = await fetch('/api/marketplace/purchases');
+        if (res.ok) {
+          const purchases = await res.json();
+          const purchased = purchases.some((p: any) => p.itemId === id);
+          setIsPurchased(purchased);
+        }
+      } catch (err) {
+        console.error("Failed to check purchase status");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkPurchase();
+  }, [id]);
 
   // Mock data for the item
   const items: any = {
@@ -78,6 +99,7 @@ export default function ItemDetailPage() {
         })
       });
       if (res.ok) {
+        setIsPurchased(true);
         alert(`Successfully purchased ${item.name}! It is now available in your library.`);
       }
     } catch (err) {
@@ -166,11 +188,16 @@ export default function ItemDetailPage() {
               </div>
 
               <Button 
-                className="w-full h-16 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-blue-500/20"
-                onClick={handleCheckout}
+                className={`w-full h-16 font-black uppercase tracking-widest rounded-2xl shadow-2xl transition-all ${
+                  isPurchased 
+                  ? "bg-emerald-600 hover:bg-emerald-500 text-white cursor-default" 
+                  : "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/20"
+                }`}
+                onClick={isPurchased ? undefined : handleCheckout}
+                disabled={isLoading}
               >
                 <CreditCard className="w-5 h-5 mr-3" />
-                {item.price === 0 ? 'Install Template' : 'Checkout Now'}
+                {isLoading ? 'Checking...' : isPurchased ? 'Purchased ✓' : item.price === 0 ? 'Install Template' : 'Checkout Now'}
               </Button>
            </Card>
         </div>

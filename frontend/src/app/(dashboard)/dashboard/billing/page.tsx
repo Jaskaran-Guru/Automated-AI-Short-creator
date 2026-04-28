@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,22 @@ import { usePostHog } from "posthog-js/react";
 export default function BillingPage() {
   const posthog = usePostHog();
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const [currentPlan, setCurrentPlan] = useState<string>("FREE");
+
+  useEffect(() => {
+    const fetchPlan = async () => {
+      try {
+        const res = await fetch('/api/workspace/current');
+        if (res.ok) {
+          const data = await res.json();
+          setCurrentPlan(data.plan);
+        }
+      } catch (err) {
+        console.error("Failed to fetch plan");
+      }
+    };
+    fetchPlan();
+  }, []);
 
   const plans = [
     {
@@ -144,12 +160,18 @@ export default function BillingPage() {
 
               <Button 
                 variant={plan.variant as any} 
-                className={`w-full rounded-2xl py-7 font-black uppercase tracking-widest text-xs transition-all ${plan.popular ? "shadow-lg shadow-blue-500/20" : "border-slate-800 hover:bg-slate-800"}`}
+                className={`w-full rounded-2xl py-7 font-black uppercase tracking-widest text-xs transition-all ${
+                  currentPlan.toUpperCase() === plan.name.toUpperCase() 
+                  ? "bg-emerald-600 hover:bg-emerald-500 text-white border-none cursor-default" 
+                  : plan.popular ? "shadow-lg shadow-blue-500/20" : "border-slate-800 hover:bg-slate-800"
+                }`}
                 onClick={() => {
-                  posthog.capture('clicked_upgrade', { plan: plan.name, cycle: billingCycle });
+                  if (currentPlan.toUpperCase() !== plan.name.toUpperCase()) {
+                    posthog.capture('clicked_upgrade', { plan: plan.name, cycle: billingCycle });
+                  }
                 }}
               >
-                {plan.cta}
+                {currentPlan.toUpperCase() === plan.name.toUpperCase() ? "Current Plan ✓" : plan.cta}
               </Button>
             </Card>
           </motion.div>

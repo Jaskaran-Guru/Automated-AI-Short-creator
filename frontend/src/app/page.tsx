@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -9,9 +9,10 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useUser } from "@clerk/nextjs"
 
-const PricingCard = ({ title, price, features, highlighted = false }: any) => (
+const PricingCard = ({ title, price, features, highlighted = false, isCurrent = false }: any) => (
   <div className={`glass p-8 rounded-3xl flex flex-col h-full card-hover ${highlighted ? 'border-blue-500/50 bg-blue-500/5' : 'border-slate-800'}`}>
     {highlighted && (
       <Badge className="w-fit mb-4 bg-blue-500 text-white border-none">Most Popular</Badge>
@@ -29,8 +30,12 @@ const PricingCard = ({ title, price, features, highlighted = false }: any) => (
         </li>
       ))}
     </ul>
-    <Button variant={highlighted ? "premium" : "outline"} className="w-full py-6 rounded-xl font-bold">
-      Get Started
+    <Button 
+      variant={isCurrent ? "outline" : (highlighted ? "premium" : "outline")} 
+      className={`w-full py-6 rounded-xl font-bold ${isCurrent ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-500 cursor-default" : ""}`}
+      disabled={isCurrent}
+    >
+      {isCurrent ? "Current Plan ✓" : "Get Started"}
     </Button>
   </div>
 )
@@ -63,6 +68,17 @@ const FAQItem = ({ question, answer }: any) => {
 }
 
 export default function LandingPage() {
+  const { isSignedIn } = useUser()
+  const [currentPlan, setCurrentPlan] = useState<string>("FREE")
+
+  useEffect(() => {
+    if (isSignedIn) {
+      fetch('/api/workspace/current')
+        .then(res => res.json())
+        .then(data => setCurrentPlan(data.plan))
+        .catch(err => console.error("Plan fetch failed"))
+    }
+  }, [isSignedIn])
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden bg-[#020617]">
       {/* Background Orbs */}
@@ -279,22 +295,26 @@ export default function LandingPage() {
             title="Free" 
             price="$0" 
             features={["1 video/month", "Watermarked clips", "Standard AI", "720p Export"]} 
+            isCurrent={currentPlan.toUpperCase() === "FREE"}
           />
           <PricingCard 
             title="Starter" 
             price="$29" 
             features={["60 processing minutes / mo", "No Watermark", "Viral Moment Detection", "1080p HD", "Email Support"]} 
             highlighted={true}
+            isCurrent={currentPlan.toUpperCase() === "STARTER"}
           />
           <PricingCard 
             title="Pro" 
             price="$79" 
             features={["300 processing minutes / mo", "Auto Distribution Engine", "Social Media Scheduler", "Analytics Dashboard", "Priority AI"]} 
+            isCurrent={currentPlan.toUpperCase() === "PRO"}
           />
           <PricingCard 
             title="Agency" 
             price="$299" 
             features={["1500 processing minutes / mo", "Multi-Client Mgmt", "White-labeling", "Bulk Export", "Account Manager"]} 
+            isCurrent={currentPlan.toUpperCase() === "AGENCY_PRO"}
           />
         </div>
       </section>

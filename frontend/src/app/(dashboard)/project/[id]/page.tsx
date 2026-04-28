@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import Link from "next/link"
 import { useParams } from "next/navigation"
+import { BACKEND_URL } from "@/lib/api"
 
 export default function ProjectResultsPage() {
   const params = useParams()
@@ -177,7 +178,7 @@ export default function ProjectResultsPage() {
               </div>
               {selectedClip && (
                 <video 
-                  src={selectedClip.fileUrl} 
+                  src={selectedClip.fileUrl.startsWith('http') ? selectedClip.fileUrl : `${BACKEND_URL}/static/${project.id}/${selectedClip.fileUrl.split('/').pop()}`} 
                   className="w-full h-full object-cover relative z-0"
                   controls
                 />
@@ -371,7 +372,7 @@ export default function ProjectResultsPage() {
                   }`}
                 >
                   <div className="w-24 aspect-[9/16] bg-slate-800 rounded-xl flex-shrink-0 flex items-center justify-center relative overflow-hidden">
-                     <video src={clip.fileUrl} className="absolute inset-0 w-full h-full object-cover opacity-50" />
+                     <video src={clip.fileUrl.startsWith('http') ? clip.fileUrl : `${BACKEND_URL}/static/${project.id}/${clip.fileUrl.split('/').pop()}`} className="absolute inset-0 w-full h-full object-cover opacity-50" />
                      <Play className={`w-6 h-6 z-10 ${selectedClip?.id === clip.id ? "text-blue-500" : "text-white"}`} />
                      {selectedClip?.id === clip.id && (
                        <div className="absolute inset-0 bg-blue-500/10 animate-pulse"></div>
