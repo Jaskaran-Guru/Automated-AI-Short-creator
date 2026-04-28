@@ -1,4 +1,4 @@
-﻿import { getCurrentWorkspace } from "@/lib/agency-context";
+import { getCurrentWorkspace } from "@/lib/agency-context";
 import { db } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { GenerateReportButton } from "@/components/dashboard/GenerateReportButton";
 
 export default async function ReportsPage({
     searchParams
@@ -48,10 +49,7 @@ export default async function ReportsPage({
           <h1 className="text-3xl font-black text-white mb-2">Performance Reports</h1>
           <p className="text-slate-400">Generate white-label performance summaries for your clients.</p>
         </div>
-        <Button variant="premium" className="rounded-xl px-6 h-12">
-          <Plus className="w-5 h-5 mr-2" />
-          Generate New Report
-        </Button>
+        <GenerateReportButton className="rounded-xl px-6 h-12" />
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 mb-12">
@@ -102,9 +100,11 @@ export default async function ReportsPage({
             <div className="p-20 text-center">
                 <FileBarChart className="w-12 h-12 text-slate-700 mx-auto mb-4" />
                 <p className="text-slate-500 font-medium">No reports generated for this client yet.</p>
-                <Button variant="ghost" className="text-blue-400 mt-2 hover:bg-blue-500/5">
-                    Click to generate your first report
-                </Button>
+                <GenerateReportButton 
+                    variant="ghost" 
+                    className="text-blue-400 mt-2 hover:bg-blue-500/5"
+                    label="Click to generate your first report"
+                />
             </div>
         ) : (
             <div className="divide-y divide-slate-800">

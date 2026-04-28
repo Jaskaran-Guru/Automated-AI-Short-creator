@@ -89,12 +89,12 @@ export default function ItemDetailPage() {
 
   const handleCheckout = async () => {
     try {
-      const res = await fetch(`${BACKEND_URL}/marketplace/purchase`, {
+      const res = await fetch('/api/marketplace/purchases', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          item_id: id,
-          item_name: item.name,
+          itemId: id,
+          itemName: item.name,
           price: item.price
         })
       });

@@ -88,6 +88,33 @@ export default function BillingPage() {
     }
   ];
 
+  const handleUpgrade = async (planName: string) => {
+    try {
+      if (planName === "Agency") {
+        window.location.href = "mailto:sales@virail.com?subject=Agency Plan Inquiry";
+        return;
+      }
+
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          priceId: planName === "Pro" ? "price_pro_monthly" : "price_starter_monthly", // Placeholders
+        }),
+      });
+
+      if (res.ok) {
+        const { url } = await res.json();
+        window.location.href = url;
+      } else {
+        console.error("Failed to initiate checkout");
+        alert("Checkout failed. Please try again or contact support.");
+      }
+    } catch (err) {
+      console.error("Upgrade error:", err);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-16 py-10">
       <div className="text-center space-y-6">
@@ -168,6 +195,7 @@ export default function BillingPage() {
                 onClick={() => {
                   if (currentPlan.toUpperCase() !== plan.name.toUpperCase()) {
                     posthog.capture('clicked_upgrade', { plan: plan.name, cycle: billingCycle });
+                    handleUpgrade(plan.name);
                   }
                 }}
               >
