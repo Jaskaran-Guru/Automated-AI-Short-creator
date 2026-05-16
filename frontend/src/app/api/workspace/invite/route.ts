@@ -54,8 +54,8 @@ export async function POST(req: Request) {
     const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/invite/${token}`;
 
     if (resend) {
-      await resend.emails.send({
-        from: "Virail Team <noreply@virail.ai>",
+      const { data, error } = await resend.emails.send({
+        from: "onboarding@resend.dev",
         to: email,
         subject: `You've been invited to join ${workspace.name} on Virail`,
         html: `
@@ -68,6 +68,12 @@ export async function POST(req: Request) {
           </div>
         `
       });
+
+      if (error) {
+        console.error("[RESEND_ERROR]", error);
+        return new NextResponse(`Email Error: ${error.message}`, { status: 500 });
+      }
+
       console.log(`[AGENCY INVITE] Sent email to ${email} for workspace ${workspace.name}. Token: ${token}`);
     } else {
       console.log(`[AGENCY INVITE] Resend API key missing. Mock sent to ${email} for workspace ${workspace.name}. Token: ${token}`);
