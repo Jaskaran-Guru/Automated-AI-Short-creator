@@ -100,9 +100,13 @@ export default function ItemDetailPage() {
       if (res.ok) {
         setIsPurchased(true);
         alert(`Successfully purchased ${item.name}! It is now available in your library.`);
+      } else {
+        const errorText = await res.text();
+        alert(`Failed to purchase: ${res.status} ${errorText}`);
       }
-    } catch (err) {
-      console.error("Purchase failed");
+    } catch (err: any) {
+      console.error("Purchase failed", err);
+      alert(`Network error: ${err.message}`);
     }
   }
 

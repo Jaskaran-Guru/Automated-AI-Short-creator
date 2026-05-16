@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { GenerateReportButton } from "@/components/dashboard/GenerateReportButton";
+import { ReportActions } from "@/components/dashboard/ReportActions";
 
 export default async function ReportsPage({
     searchParams
@@ -118,16 +119,7 @@ export default async function ReportsPage({
                                 <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Generated on {new Date(report.createdAt).toLocaleDateString()}</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button variant="ghost" size="sm" className="text-slate-400">
-                                <Eye className="w-4 h-4 mr-2" />
-                                Preview
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-blue-400">
-                                <Share2 className="w-4 h-4 mr-2" />
-                                Copy Link
-                            </Button>
-                        </div>
+                        <ReportActions shareToken={report.shareToken} />
                     </div>
                 ))}
             </div>

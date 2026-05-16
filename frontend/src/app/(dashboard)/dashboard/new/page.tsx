@@ -118,7 +118,7 @@ export default function NewProjectPage() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'video/*': ['.mp4', '.mov', '.webm'] },
+    accept: { 'video/*': [] },
     multiple: false
   })
 
