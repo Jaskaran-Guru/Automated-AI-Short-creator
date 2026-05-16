@@ -1,3 +1,12 @@
+---
+title: Virail
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
 # Virail
 
 Virail is an AI-based video automation system designed to streamline the production of vertical short-form content. Utilizing advanced machine learning models and audio-visual processing, Virail automatically identifies the most engaging moments from long-form videos and reframes them into high-quality, 9:16 shorts complete with burned-in animated captions.
