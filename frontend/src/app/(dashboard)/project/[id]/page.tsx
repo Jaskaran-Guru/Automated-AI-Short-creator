@@ -43,7 +43,6 @@ export default function ProjectResultsPage() {
           setSelectedClip(data.clips[0]);
         }
 
-        // Poll if processing
         if (data.status === "PROCESSING" || data.status === "UPLOADING") {
           setTimeout(fetchProject, 5000);
         }
@@ -143,7 +142,7 @@ export default function ProjectResultsPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-10">
-      {/* Header */}
+      {}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
            <Link href="/dashboard">
@@ -167,7 +166,7 @@ export default function ProjectResultsPage() {
       </div>
 
       <div className="grid lg:grid-cols-12 gap-10">
-        {/* Main Preview Area */}
+        {}
         <div className="lg:col-span-7 space-y-6">
            <div className="aspect-[9/16] max-h-[700px] w-full bg-slate-900 rounded-[3rem] overflow-hidden border border-slate-800 relative group mx-auto">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
@@ -184,7 +183,7 @@ export default function ProjectResultsPage() {
                 />
               )}
               
-              {/* Overlays */}
+              {}
               {selectedClip && (
                 <div className="absolute top-8 left-8 right-8 flex justify-between items-start z-20 pointer-events-none">
                    <Badge className="bg-blue-500 text-white border-none px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest">
@@ -216,7 +215,7 @@ export default function ProjectResultsPage() {
               </Button>
            </div>
 
-           {/* AI Content Intelligence Panel */}
+           {}
            {selectedClip && selectedClip.hookRewrite && (
               <Card className="bg-slate-900/50 border-slate-800 rounded-[2.5rem] p-8 space-y-6">
                 <div className="flex items-center justify-between">
@@ -320,7 +319,7 @@ export default function ProjectResultsPage() {
            )}
         </div>
 
-        {/* Clips List */}
+        {}
         <div className="lg:col-span-5 space-y-6">
             {clips.length > 0 && (
               <motion.div 
@@ -408,7 +407,7 @@ export default function ProjectResultsPage() {
         </div>
       </div>
 
-      {/* Schedule Modal */}
+      {}
       {isScheduleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <motion.div 
@@ -437,7 +436,7 @@ export default function ProjectResultsPage() {
                   <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-center">
                     <p className="text-sm text-slate-400 mb-4">No accounts connected</p>
                     <Button variant="outline" className="w-full rounded-xl" onClick={() => {
-                      // Mock connect
+
                       fetch("/api/accounts", { 
                         method: "POST", 
                         body: JSON.stringify({ platform: "YOUTUBE" }) 

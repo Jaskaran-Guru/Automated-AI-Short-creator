@@ -5,11 +5,10 @@ config.py — Central configuration for AI Video Shorts Creator
 import os
 import torch
 
-# ─────────────────────────────────────────────
-# AI Model Cache Redirection
-# ─────────────────────────────────────────────
-# Force all AI models to use a local writable directory within the app folder.
-# This prevents "Permission denied" errors in restricted environments.
+
+
+
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 _local_cache = os.path.join(BASE_DIR, ".cache")
 os.makedirs(_local_cache, exist_ok=True)
@@ -23,27 +22,23 @@ os.makedirs(os.environ["WHISPER_CACHE_DIR"], exist_ok=True)
 os.makedirs(os.environ["YOLO_CONFIG_DIR"], exist_ok=True)
 os.makedirs(os.environ["TORCH_HOME"], exist_ok=True)
 
-# ─────────────────────────────────────────────
-# Device
-# ─────────────────────────────────────────────
+
+
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-# ─────────────────────────────────────────────
-# Paths
-# ─────────────────────────────────────────────
+
+
 TEMP_DIR = os.path.join(BASE_DIR, ".temp")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 
-# ─────────────────────────────────────────────
-# Whisper
-# ─────────────────────────────────────────────
+
+
 WHISPER_MODEL = "small"          # base | small | medium | large | large-v2
 WHISPER_LANGUAGE = None          # None = auto-detect, or "en", "hi", "es" etc.
 WHISPER_CACHE_DIR = os.environ["WHISPER_CACHE_DIR"]
 
-# ─────────────────────────────────────────────
-# Scene Scoring Weights  (must sum to 1.0)
-# ─────────────────────────────────────────────
+
+
 SCORE_WEIGHT_CLIP  = 0.40        # CLIP semantic relevance
 SCORE_WEIGHT_YOLO  = 0.35        # YOLO visual activity (faces / objects)
 SCORE_WEIGHT_AUDIO = 0.25        # Audio energy / loudness
@@ -51,7 +46,6 @@ SCORE_WEIGHT_AUDIO = 0.25        # Audio energy / loudness
 CLIP_MODEL_NAME    = "ViT-B/32"
 YOLO_MODEL_NAME    = "yolov8n.pt" # smallest + fastest
 
-# Prompts used for CLIP scoring
 CLIP_POSITIVE_PROMPTS = [
     "exciting action scene",
     "interesting interview close-up",
@@ -66,16 +60,14 @@ CLIP_NEGATIVE_PROMPTS = [
     "dark scene nothing happening",
 ]
 
-# ─────────────────────────────────────────────
-# Video / Shorts
-# ─────────────────────────────────────────────
+
+
 SHORT_WIDTH  = 1080
 SHORT_HEIGHT = 1920
 SHORT_FPS    = 30
 
-# ─────────────────────────────────────────────
-# Caption / Subtitle Style
-# ─────────────────────────────────────────────
+
+
 CAPTION_FONT      = "Arial"
 CAPTION_FONT_SIZE = 22          # in ASS points (scales with resolution)
 CAPTION_COLOR     = "&H00FFFFFF"   # white  (ASS BGR hex)
@@ -84,19 +76,16 @@ CAPTION_OUTLINE   = "&H00000000"   # black outline
 CAPTION_BOLD      = True
 CAPTION_STYLE     = "word_highlight"  # word_highlight | full_line
 
-# Position: bottom-third of the frame
 CAPTION_MARGIN_V   = 80         # pixels from bottom
 
-# ─────────────────────────────────────────────
-# Pipeline
-# ─────────────────────────────────────────────
+
+
 MIN_GAP_BETWEEN_CLIPS = 5       # seconds — avoid overlapping selections
 FRAME_SAMPLE_RATE     = 1       # sample 1 frame per second for scoring
 BATCH_SIZE            = 16      # number of frames to process in one AI batch
 MAX_SHORTS            = 20
 
-# ─────────────────────────────────────────────
-# FFmpeg binary (auto-detected; override if needed)
-# ─────────────────────────────────────────────
+
+
 FFMPEG_BIN  = "ffmpeg"
 FFPROBE_BIN = "ffprobe"

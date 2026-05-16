@@ -14,7 +14,6 @@ export async function POST(req: Request) {
     const dbUser = await db.user.findUnique({ where: { clerkId: userId } });
     if (!dbUser) return new NextResponse("User not found", { status: 404 });
 
-    // Mock successful connection
     const account = await db.socialAccount.create({
       data: {
         userId: dbUser.id,

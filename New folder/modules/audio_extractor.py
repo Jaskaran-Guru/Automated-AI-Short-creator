@@ -7,9 +7,7 @@ from modules.utils import log, run_ffprobe, run_ffmpeg, ensure_dir
 import config
 
 
-# ─────────────────────────────────────────────────────────────
-# Public API
-# ─────────────────────────────────────────────────────────────
+
 
 def list_audio_tracks(video_path: str) -> List[Dict]:
     """
@@ -91,7 +89,6 @@ def select_audio_track(tracks: List[Dict], interactive: bool = True) -> Optional
         log.info(f"Single audio track found: [{t['codec']}] lang={t['language']} ch={t['channels']}")
         return t["index"]
 
-    # Multiple tracks
     if not interactive:
         log.info(f"Multiple audio tracks found; auto-selecting first (index {tracks[0]['index']}).")
         return tracks[0]["index"]

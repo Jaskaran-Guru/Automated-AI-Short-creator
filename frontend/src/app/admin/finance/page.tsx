@@ -18,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 export default async function AdminFinancePage() {
   await protectAdminPage(["SUPER_ADMIN"]);
 
-  // Mocked Financial Intelligence (In production, these come from RevenueMetric and Stripe)
   const metrics = {
     mrr: 84500,
     arr: 1014000,
@@ -133,7 +132,7 @@ export default async function AdminFinancePage() {
         </Card>
       </div>
 
-      {/* AI Margin Intelligence */}
+      {}
       <Card className="bg-slate-900/50 border-slate-800 p-10 rounded-[3rem] glass-panel border-dashed">
             <div className="flex items-center gap-3 mb-10">
                 <Zap className="w-6 h-6 text-yellow-500" />

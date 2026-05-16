@@ -29,7 +29,7 @@ export default async function PublicReportPage({ params }: { params: { shareToke
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-300 py-20 px-6">
-      {/* Premium Header */}
+      {}
       <div className="max-w-5xl mx-auto mb-20 text-center">
         <div className="flex justify-center mb-10">
             <div className="bg-slate-900/50 p-4 rounded-[2rem] border border-white/5 flex items-center gap-4 px-8">

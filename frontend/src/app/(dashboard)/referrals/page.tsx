@@ -81,7 +81,7 @@ export default function ReferralsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Stats */}
+        {}
         <div className="lg:col-span-8 space-y-8">
            <Card className="bg-slate-900/50 border-slate-800 glass-panel rounded-[3rem] p-10 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-12 opacity-10">
@@ -157,7 +157,7 @@ export default function ReferralsPage() {
            </div>
         </div>
 
-        {/* Right Column: Leaderboard/Sidebar */}
+        {}
         <div className="lg:col-span-4 space-y-8">
            <Card className="bg-slate-900/50 border-slate-800 rounded-[3rem] p-8">
               <h3 className="text-xl font-black text-white uppercase mb-6 flex items-center gap-2">

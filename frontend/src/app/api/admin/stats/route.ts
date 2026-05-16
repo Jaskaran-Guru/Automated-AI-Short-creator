@@ -25,7 +25,6 @@ export async function GET() {
       _sum: { minutesUsed: true }
     });
 
-    // Mock revenue based on plan distribution from workspaces
     const plans = await db.workspace.groupBy({
       by: ["plan"],
       _count: { id: true }

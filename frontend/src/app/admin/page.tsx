@@ -17,7 +17,6 @@ import { Badge } from "@/components/ui/badge";
 export default async function AdminDashboard() {
   await protectAdminPage(["SUPER_ADMIN", "ADMIN"]);
 
-  // Mock data for Executive Insights (In production, these come from db.systemMetric)
   const metrics = {
     mrr: 12450,
     mrrGrowth: 12.5,

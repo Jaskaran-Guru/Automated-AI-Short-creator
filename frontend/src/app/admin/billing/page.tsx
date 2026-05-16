@@ -25,7 +25,6 @@ export default async function AdminBillingPage() {
     take: 20
   });
 
-  // Calculate high-level stats
   const activeCount = subscriptions.filter(s => s.status === 'active').length;
   const pastDueCount = subscriptions.filter(s => s.status === 'past_due').length;
 

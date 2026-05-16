@@ -46,7 +46,6 @@ export default async function AdminSalesPage() {
   
   const winRate = leads.length > 0 ? (wonDeals.length / leads.filter(l => l.stage === 'WON' || l.stage === 'LOST').length || 0) * 100 : 0;
 
-  // Sales Velocity (Days from creation to WON)
   const avgVelocity = wonDeals.length > 0 
     ? wonDeals.reduce((acc, l) => acc + (new Date(l.updatedAt).getTime() - new Date(l.createdAt).getTime()), 0) / wonDeals.length / 86400000 
     : 0;

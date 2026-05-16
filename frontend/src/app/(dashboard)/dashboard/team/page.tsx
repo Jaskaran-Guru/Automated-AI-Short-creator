@@ -49,7 +49,7 @@ export default function TeamPage() {
     if (!inviteEmail) return;
     setIsInviting(true);
     try {
-        // Mocking the invite process
+
         await new Promise(resolve => setTimeout(resolve, 1000));
         alert(`Invitation sent to ${inviteEmail}!`);
         setIsInviteModalOpen(false);
@@ -84,7 +84,7 @@ export default function TeamPage() {
 
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-           {/* Members Table */}
+           {}
           <Card className="bg-slate-900/50 border-slate-800 rounded-[2.5rem] overflow-hidden glass-panel">
             <Table>
               <TableHeader>
@@ -133,7 +133,7 @@ export default function TeamPage() {
             </Table>
           </Card>
 
-          {/* Pending Invites */}
+          {}
           {pendingInvites.length > 0 && (
             <Card className="bg-slate-900/50 border-slate-800 rounded-[2.5rem] overflow-hidden glass-panel border-dashed">
               <div className="p-8 border-b border-slate-800 bg-slate-900/30 flex items-center gap-3">
@@ -166,7 +166,7 @@ export default function TeamPage() {
         </div>
 
         <div className="space-y-8">
-           {/* Recent Activity */}
+           {}
           <Card className="bg-slate-900/50 border-slate-800 rounded-[2.5rem] overflow-hidden glass-panel">
             <div className="p-8 border-b border-slate-800 bg-slate-900/30 flex items-center gap-3">
               <Shield className="w-5 h-5 text-blue-500" />
@@ -204,7 +204,7 @@ export default function TeamPage() {
         </div>
       </div>
 
-      {/* Invite Modal */}
+      {}
       {isInviteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <motion.div 

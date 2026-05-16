@@ -21,7 +21,6 @@ export default function ReferralsPage() {
   const [copied, setCopied] = useState(false);
   const [applied, setApplied] = useState(false);
 
-  // Mock User Data (consistent with your existing UI)
   const userData = {
     id: "user_123",
     name: "Jaskaran Guru",
@@ -146,7 +145,7 @@ export default function ReferralsPage() {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        {/* Map referrals here if needed */}
+                        {}
                     </div>
                 )}
             </div>

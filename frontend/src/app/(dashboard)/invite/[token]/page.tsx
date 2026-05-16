@@ -14,8 +14,7 @@ import Link from "next/link";
 
 export default async function AcceptInvitePage({ params }: { params: { token: string } }) {
   const { userId: clerkId } = await auth();
-  
-  // Find the invite
+
   const invite = await db.invite.findUnique({
     where: { token: params.token },
     include: { workspace: true }
@@ -36,7 +35,6 @@ export default async function AcceptInvitePage({ params }: { params: { token: st
     );
   }
 
-  // Check expiry
   if (invite.expiresAt < new Date()) {
     return (
         <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
@@ -52,7 +50,6 @@ export default async function AcceptInvitePage({ params }: { params: { token: st
       );
   }
 
-  // Action to accept
   async function joinWorkspace() {
     "use server"
     
@@ -65,11 +62,9 @@ export default async function AcceptInvitePage({ params }: { params: { token: st
 
     if (!invite) return;
 
-    // Find the current user in our DB
     const user = await db.user.findUnique({ where: { clerkId } });
     if (!user) return;
 
-    // Join the workspace
     await db.workspaceMember.create({
       data: {
         workspaceId: invite.workspaceId,
@@ -78,7 +73,6 @@ export default async function AcceptInvitePage({ params }: { params: { token: st
       }
     });
 
-    // Mark invite as accepted
     await db.invite.update({
       where: { id: invite.id },
       data: { acceptedAt: new Date() }
@@ -89,7 +83,7 @@ export default async function AcceptInvitePage({ params }: { params: { token: st
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Decorative Orbs */}
+      {}
       <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500 rounded-full blur-[128px] opacity-20"></div>
       <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500 rounded-full blur-[128px] opacity-20"></div>
 

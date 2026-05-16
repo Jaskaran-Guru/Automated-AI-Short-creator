@@ -30,7 +30,6 @@ export default async function InsightsPage() {
 
   if (!user) return null;
 
-  // Mocked ROI calculations for the demo
   const stats = {
     timeSaved: 142,
     reachEst: 85400,

@@ -1,7 +1,4 @@
-﻿/**
- * VIRAIL Adaptive Prompt Engine
- * This system injects historical "winners" into AI generation to improve output quality.
- */
+﻿
 
 export interface PromptContext {
     niche?: string;

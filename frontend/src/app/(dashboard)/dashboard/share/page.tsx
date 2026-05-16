@@ -89,7 +89,7 @@ export default function SharePage() {
         </div>
       </div>
 
-      {/* Shareable Card */}
+      {}
       <div ref={reportRef} id="share-card" className="relative rounded-[3rem] overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 border border-white/10 p-12 shadow-2xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/10 blur-[80px] rounded-full" />
@@ -146,7 +146,7 @@ export default function SharePage() {
         </div>
       </div>
 
-      {/* Share Actions */}
+      {}
       <div className="grid md:grid-cols-3 gap-4">
         <a
           href={`https://twitter.com/intent/tweet?text=${twitterText}`}

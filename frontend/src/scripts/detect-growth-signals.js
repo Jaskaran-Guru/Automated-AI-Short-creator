@@ -1,10 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const db = new PrismaClient()
 
-/**
- * Scans the database for retention risks and expansion opportunities.
- * Powers the VIRAIL Moat Engine's automated growth layer.
- */
+
 async function detectGrowthSignals() {
   console.log('🔍 Scanning for Growth & Retention Signals...')
   
@@ -12,7 +9,7 @@ async function detectGrowthSignals() {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   try {
-    // 1. Detect Inactive High-Value Users (Churn Risk)
+
     const inactiveUsers = await db.user.findMany({
       where: {
         lastLogin: { lt: fourteenDaysAgo },
@@ -40,7 +37,6 @@ async function detectGrowthSignals() {
       });
     }
 
-    // 2. Detect Upsell Opportunities (Minute Limit > 80%)
     const nearLimitWorkspaces = await db.workspace.findMany({
       where: {
         minutesUsed: { gte: 80 }, // In production: db.workspace.minutesLimit * 0.8
@@ -67,8 +63,7 @@ async function detectGrowthSignals() {
         }
     }
 
-    // 3. Detect "Ghost" Workspaces (Signed up but never uploaded)
-    // In production, we'd check EventLog for 'video_uploaded'
+
 
     console.log(`✅ Growth Scan Complete.`);
   } catch (error) {

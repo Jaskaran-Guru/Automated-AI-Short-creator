@@ -25,7 +25,6 @@ export async function getOSMetrics(): Promise<OSMetrics> {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-  // 1. Leads and Demos
   const [
     leadsContacted,
     demosBooked,
@@ -58,7 +57,6 @@ export async function getOSMetrics(): Promise<OSMetrics> {
     })
   ]);
 
-  // 2. Activated Users (Users who created at least 1 clip)
   const activatedUsers = await db.user.count({
     where: {
       eventLogs: {
@@ -70,7 +68,6 @@ export async function getOSMetrics(): Promise<OSMetrics> {
     }
   });
 
-  // 3. Content Published
   const contentPublished = await db.socialPost.count({
     where: {
       status: "PUBLISHED",
@@ -78,7 +75,6 @@ export async function getOSMetrics(): Promise<OSMetrics> {
     }
   });
 
-  // 4. Tickets Resolved
   const ticketsResolved = await db.ticket.count({
     where: {
       status: "CLOSED",
@@ -86,7 +82,6 @@ export async function getOSMetrics(): Promise<OSMetrics> {
     }
   });
 
-  // 5. MRR Calculation (Estimated from plans)
   const planValues: Record<Plan, number> = {
     FREE: 0,
     STARTER: 49,
@@ -102,7 +97,6 @@ export async function getOSMetrics(): Promise<OSMetrics> {
 
   const mrr = currentWorkspaces.reduce((acc, ws) => acc + (planValues[ws.plan] || 0), 0);
 
-  // 6. Churn and Expansion (Simplified for now)
   const churnToday = await db.eventLog.count({
     where: {
       eventName: "subscription_cancelled",
@@ -117,7 +111,6 @@ export async function getOSMetrics(): Promise<OSMetrics> {
     }
   });
 
-  // 7. Revenue Today (Directly from WON leads today)
   const wonLeadsToday = await db.lead.findMany({
     where: {
       stage: "WON",
@@ -127,7 +120,6 @@ export async function getOSMetrics(): Promise<OSMetrics> {
   });
   const revenueToday = wonLeadsToday.reduce((acc, l) => acc + (l.dealValue || 0), 0);
 
-  // Trend calculation (Mocked for now as we don't have enough history in SystemMetric yet)
   const revenueTrend = 12.4;
   const mrrTrend = 8.2;
 

@@ -1,10 +1,4 @@
-﻿/**
- * VIRAIL Growth Intelligence Engine
- * The proprietary data moat that predicts viral performance before publishing.
- *
- * This system analyzes platform-wide pattern clusters from 1.2M+ clips
- * to produce a composite Viral Momentum Scoreâ„¢ for any given content input.
- */
+﻿
 
 export interface ClipIntelligenceInput {
   durationSeconds: number;
@@ -38,10 +32,7 @@ export interface IntelligenceInsight {
   impact: number; // -20 to +20 score impact
 }
 
-/**
- * Platform-Niche performance clusters derived from VIRAIL's data moat.
- * In production, these thresholds are recomputed nightly from the DailyMetric table.
- */
+
 const PERFORMANCE_CLUSTERS: Record<
   string,
   { optimalMin: number; optimalMax: number; topHooks: string[] }
@@ -84,9 +75,7 @@ const PEAK_POSTING_WINDOWS: Record<string, number[]> = {
   INSTAGRAM_REELS: [11, 13, 19, 20],
 };
 
-/**
- * Produces a comprehensive predictive intelligence report for a given clip.
- */
+
 export function analyzeClipIntelligence(
   input: ClipIntelligenceInput
 ): ClipIntelligenceReport {
@@ -97,7 +86,6 @@ export function analyzeClipIntelligence(
   const clusterKey = `${input.platform}:${input.niche.toLowerCase()}`;
   const cluster = PERFORMANCE_CLUSTERS[clusterKey];
 
-  // --- 1. LENGTH ANALYSIS ---
   if (cluster) {
     if (
       input.durationSeconds >= cluster.optimalMin &&
@@ -135,7 +123,6 @@ export function analyzeClipIntelligence(
     }
   }
 
-  // --- 2. HOOK STRENGTH ANALYSIS ---
   if (cluster && cluster.topHooks.includes(input.hookType)) {
     score += 20;
     insights.push({
@@ -169,7 +156,6 @@ export function analyzeClipIntelligence(
     );
   }
 
-  // --- 3. TIMING ANALYSIS ---
   if (input.postingHour !== undefined) {
     const peakWindows = PEAK_POSTING_WINDOWS[input.platform] || [];
     const isInPeak = peakWindows.some(
@@ -197,7 +183,6 @@ export function analyzeClipIntelligence(
     }
   }
 
-  // --- 4. FORMAT BONUSES ---
   if (input.hasCaption) {
     score += 5;
     insights.push({
@@ -217,7 +202,6 @@ export function analyzeClipIntelligence(
     });
   }
 
-  // --- FINALIZE ---
   score = Math.max(0, Math.min(100, score));
   const hookStrength =
     score >= 80
@@ -240,10 +224,7 @@ export function analyzeClipIntelligence(
   };
 }
 
-/**
- * Runs batch intelligence on an array of clips.
- * Used by the nightly aggregation worker for platform-wide scoring.
- */
+
 export function batchAnalyzeClips(clips: ClipIntelligenceInput[]) {
   return clips.map((clip) => ({
     input: clip,

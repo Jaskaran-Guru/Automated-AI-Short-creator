@@ -3,9 +3,7 @@ import { db } from "@/lib/prisma";
 import { AdminRole } from "@prisma/client";
 import { redirect } from "next/navigation";
 
-/**
- * Validates if the current user has an admin system role.
- */
+
 export async function getAdminContext() {
   const { userId: clerkId } = await auth();
   if (!clerkId) return null;
@@ -19,10 +17,7 @@ export async function getAdminContext() {
   return user;
 }
 
-/**
- * Server-side protection for admin pages.
- * Redirects to dashboard if not an authorized admin.
- */
+
 export async function protectAdminPage(allowedRoles: AdminRole[] = ["SUPER_ADMIN", "ADMIN"]) {
   const user = await getAdminContext();
   
@@ -33,9 +28,7 @@ export async function protectAdminPage(allowedRoles: AdminRole[] = ["SUPER_ADMIN
   return user;
 }
 
-/**
- * Checks if the current admin has a specific role.
- */
+
 export async function hasAdminRole(role: AdminRole) {
   const user = await getAdminContext();
   return user?.systemRole === role || user?.systemRole === "SUPER_ADMIN";

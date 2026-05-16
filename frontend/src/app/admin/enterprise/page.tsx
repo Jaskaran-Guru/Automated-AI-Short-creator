@@ -31,7 +31,7 @@ export default async function AdminEnterprisePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        {/* Priority Infrastructure */}
+        {}
         <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-[3rem] glass-panel border-purple-500/10 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/5 blur-3xl rounded-full translate-x-20 -translate-y-20" />
             <div className="flex items-center gap-3 mb-8">
@@ -56,7 +56,7 @@ export default async function AdminEnterprisePage() {
             </Button>
         </Card>
 
-        {/* Advanced Security */}
+        {}
         <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-[3rem] glass-panel">
             <div className="flex items-center gap-3 mb-8">
                 <ShieldCheck className="w-6 h-6 text-blue-500" />

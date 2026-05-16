@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uuid
 import os
-# Force AI model caches to a local writable directory to avoid permission issues
+
 _base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _cache_dir = os.path.join(_base_dir, ".cache")
 os.environ["XDG_CACHE_HOME"] = _cache_dir
@@ -21,7 +21,6 @@ import time
 from typing import List, Optional, Dict
 import sys
 
-# Add parent directory to path to import existing modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi.staticfiles import StaticFiles
@@ -35,8 +34,7 @@ from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-# Initialize database
-# Ensure required directories exist
+
 ensure_dir("output")
 ensure_dir("temp_inputs")
 database.Base.metadata.create_all(bind=engine)
@@ -47,10 +45,8 @@ app = FastAPI(title="AI Shorts Creator API")
 def home():
     return {"status": "healthy", "message": "Virail AI API is running", "worker": "active"}
 
-# Mount output directory as static files
 app.mount("/static", StaticFiles(directory="output"), name="static")
 
-# Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -59,7 +55,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Authentication logic (Supabase)
 security = HTTPBearer()
 SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "your-placeholder-secret")
 SUPABASE_ALGORITHM = "HS256"
@@ -75,7 +70,6 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     except JWTError:
         raise HTTPException(status_code=401, detail="Could not validate credentials")
 
-# For now, we'll make auth optional to not break the current flow until the user provides the secret
 async def get_user_optional(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)):
     if not credentials:
         return "anonymous"
@@ -105,7 +99,7 @@ class MarketplacePurchase(BaseModel):
 
 @app.post("/upload")
 async def upload_video(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    # Create unique project ID and temp directory
+
     project_id = str(uuid.uuid4())
     temp_dir = os.path.join("temp_inputs", project_id)
     ensure_dir(temp_dir)
@@ -165,8 +159,7 @@ async def delete_project(project_id: str, db: Session = Depends(get_db)):
     db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
     if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
-    
-    # Clean up files
+
     project_dir = os.path.join("output", project_id)
     if os.path.exists(project_dir):
         shutil.rmtree(project_dir)
@@ -194,8 +187,7 @@ async def get_stats(db: Session = Depends(get_db)):
     
     total_clips = sum(len(p.results) if p.results else 0 for p in completed_projects)
     clips_this_week = sum(len(p.results) if p.results else 0 for p in recent_projects)
-    
-    # Estimate minutes used (30s per clip)
+
     minutes_used = total_clips * 0.5 
     
     return {
@@ -210,13 +202,13 @@ async def get_stats(db: Session = Depends(get_db)):
 
 @app.post("/user/settings")
 async def update_settings(settings: UserSettings, db: Session = Depends(get_db)):
-    # In a real app, we'd use the current_user's ID
-    # For now, we'll update a mock user or the first user in DB
+
+
     return {"message": "Settings updated successfully", "name": settings.name}
 
 @app.post("/marketplace/purchase")
 async def record_purchase(purchase: MarketplacePurchase, db: Session = Depends(get_db)):
-    # Logic to store purchase in DB (e.g., EventLog or a new Purchase table)
+
     print(f"User purchased {purchase.item_name} for ${purchase.price}")
     return {"message": f"Successfully purchased {purchase.item_name}", "item_id": purchase.item_id}
 
@@ -228,14 +220,14 @@ async def get_status(project_id: str, db: Session = Depends(get_db)):
     return db_project
 
 def run_pipeline_task(project_id: str, video_path: str, num_shorts: int, duration: int):
-    # We need a new session for the background task
+
     db = SessionLocal()
     try:
         output_dir = os.path.join("output", project_id)
         ensure_dir(output_dir)
         
         def update_progress(stage, status, progress):
-            # Update DB in real-time with "classy" flair
+
             stage_names = {
                 1: "Audio Resonance",
                 2: "Linguistic Mapping",
@@ -245,7 +237,7 @@ def run_pipeline_task(project_id: str, video_path: str, num_shorts: int, duratio
             }
             db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
             if db_project:
-                # Reload from DB immediately to check for cancellation
+
                 db.refresh(db_project)
                 if db_project.status == "cancelled":
                     raise InterruptedError("cancelled_by_user")

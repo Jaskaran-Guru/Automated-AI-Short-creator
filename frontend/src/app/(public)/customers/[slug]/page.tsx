@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-// Mock Data for Case Studies
 const caseStudies = {
   "skyline-media": {
     name: "Skyline Media",
@@ -39,7 +38,7 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
 
   return (
     <div className="bg-[#020617] min-h-screen text-white selection:bg-blue-500/30">
-      {/* Top Nav */}
+      {}
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-slate-950/50 backdrop-blur-md px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
             <Link href="/" className="flex items-center gap-2">
@@ -52,7 +51,7 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
         </div>
       </nav>
 
-      {/* Hero */}
+      {}
       <section className="pt-40 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
             <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 px-4 py-1.5 mb-8 rounded-full text-[10px] font-black uppercase tracking-widest">
@@ -76,7 +75,7 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
         </div>
       </section>
 
-      {/* Content */}
+      {}
       <section className="py-24 px-6 bg-slate-950/30">
         <div className="max-w-3xl mx-auto space-y-20">
             <div>
@@ -94,7 +93,7 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
                 </p>
             </div>
 
-            {/* Testimonial */}
+            {}
             <div className="py-20 border-t border-white/5">
                 <Quote className="w-12 h-12 text-blue-600 mb-8 opacity-50" />
                 <h3 className="text-3xl font-bold text-white italic mb-8 leading-snug">
@@ -111,7 +110,7 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
         </div>
       </section>
 
-      {/* CTA */}
+      {}
       <section className="py-32 px-6">
         <div className="max-w-5xl mx-auto text-center">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-8 leading-none">Ready to See These <br/> Results Yourself?</h2>

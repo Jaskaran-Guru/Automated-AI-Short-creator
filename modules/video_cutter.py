@@ -10,9 +10,7 @@ from modules.utils import log, run_ffmpeg, ensure_dir, seconds_to_hms
 import config
 
 
-# ─────────────────────────────────────────────────────────────
-# Internal helpers
-# ─────────────────────────────────────────────────────────────
+
 
 def _get_video_dimensions(video_path: str):
     """Return (width, height) of the video via ffprobe."""
@@ -51,26 +49,24 @@ def _compute_crop(
     target_ratio = target_w / target_h   # 9:16 ≈ 0.5625
 
     if src_ratio >= target_ratio:
-        # Landscape or square source → scale to height, then crop width
+
         scale_h = target_h
         scale_w = int(src_w * (target_h / src_h))
 
-        # Determine horizontal crop offset
         if face_cx is not None:
-            # Centre the crop around the face
+
             face_px   = int(face_cx * scale_w)
             crop_x    = face_px - target_w // 2
             crop_x    = max(0, min(crop_x, scale_w - target_w))
         else:
             crop_x = (scale_w - target_w) // 2
 
-        # FFmpeg filter chain: scale then crop
         return (
             f"scale={scale_w}:{scale_h},"
             f"crop={target_w}:{target_h}:{crop_x}:0"
         )
     else:
-        # Portrait source → scale to width, then crop height from centre
+
         scale_w = target_w
         scale_h = int(src_h * (target_w / src_w))
         crop_y  = (scale_h - target_h) // 2
@@ -80,9 +76,7 @@ def _compute_crop(
         )
 
 
-# ─────────────────────────────────────────────────────────────
-# Public API
-# ─────────────────────────────────────────────────────────────
+
 
 def cut_and_crop(
     video_path:  str,
@@ -120,7 +114,7 @@ def cut_and_crop(
     crop_filter = _compute_crop(src_w, src_h, face_cx=face_cx)
 
     if add_blur_bg:
-        # Technique: combine blurred full-frame background + sharp cropped foreground
+
         blur_filter = (
             f"scale={config.SHORT_WIDTH}:{config.SHORT_HEIGHT}:force_original_aspect_ratio=increase,"
             f"crop={config.SHORT_WIDTH}:{config.SHORT_HEIGHT},"

@@ -26,8 +26,7 @@ export default function NewProjectPage() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [estimatedDurationSeconds, setEstimatedDurationSeconds] = useState(0)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
-  
-  // Form State
+
   const [numShorts, setNumShorts] = useState("3")
   const [duration, setDuration] = useState("30")
   const [captionStyle, setCaptionStyle] = useState("Hormozi")
@@ -41,7 +40,6 @@ export default function NewProjectPage() {
 
     const file = acceptedFiles[0];
 
-    // Extract duration
     const videoElement = document.createElement('video');
     videoElement.preload = 'metadata';
     videoElement.onloadedmetadata = () => {
@@ -51,7 +49,7 @@ export default function NewProjectPage() {
     videoElement.src = URL.createObjectURL(file);
     
     try {
-      // 1. Get signature from our API
+
       const sigRes = await fetch("/api/upload", { method: "POST" });
       if (!sigRes.ok) {
         const errData = await sigRes.json().catch(() => ({}));
@@ -62,7 +60,6 @@ export default function NewProjectPage() {
       }
       const { signature, timestamp, cloudName, apiKey, folder } = await sigRes.json();
 
-      // 2. Upload to Cloudinary using Chunked Upload (supports up to 2GB)
       const chunkSize = 20 * 1024 * 1024; // 20MB chunks
       const totalSize = file.size;
       const uniqueUploadId = Math.random().toString(36).substring(2, 15);
@@ -94,12 +91,11 @@ export default function NewProjectPage() {
           console.error("[CLOUDINARY_UPLOAD_ERROR]", errorData);
           throw new Error(errorData.error?.message || "Cloudinary upload failed. Check your Cloudinary allowed origins.");
         }
-        
-        // Only the last chunk returns the full upload data
+
         if (end === totalSize) {
           uploadResponse = await response.json();
         } else {
-          // Update progress
+
           setUploadProgress(Math.round((end / totalSize) * 100));
         }
       }
@@ -122,53 +118,7 @@ export default function NewProjectPage() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'video/*': ['.mp4', '.mov', '.webm'] },
-    multiple: false
-  })
-
-  const handleStartGeneration = async () => {
-    setCurrentStep(2)
-    try {
-      const res = await fetch("/api/projects", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          videoUrl,
-          numShorts,
-          duration,
-          captionStyle,
-          platform,
-          estimatedDurationSeconds,
-        }),
-      });
-
-      if (res.status === 402) {
-        setShowUpgradeModal(true);
-        setCurrentStep(1);
-        return;
-      }
-
-      if (!res.ok) throw new Error("Failed to create project");
-      const data = await res.json();
-      
-      router.push(`/project/${data.id}`);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to start generation.");
-      setCurrentStep(1);
-    }
-  }
-
-  return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-12">
-        <h1 className="text-3xl font-bold text-white mb-2">Create New Project</h1>
-        <p className="text-slate-400">Transform your long video into viral shorts in minutes.</p>
-      </div>
-
-      {/* Stepper */}
+    accept: { 'video}
       <div className="mb-12">
         <div className="flex items-center justify-between relative px-2">
           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-slate-800 -z-10"></div>
@@ -391,7 +341,7 @@ export default function NewProjectPage() {
         )}
       </AnimatePresence>
 
-      {/* Upgrade Modal */}
+      {}
       {showUpgradeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <motion.div 

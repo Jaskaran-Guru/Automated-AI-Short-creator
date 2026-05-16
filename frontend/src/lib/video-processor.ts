@@ -22,14 +22,12 @@ export async function cutClip(
   captionStyle: string = "default"
 ) {
   const duration = endTime - startTime;
-  
-  // Basic clip and vertical crop (1080x1920)
-  // We crop the center (1080px wide) from a 16:9 1920x1080 video
+
+
   const cropFilter = "crop=h=ih:w=ih*9/16";
   const scaleFilter = "scale=1080:1920";
-  
-  // Caption burning placeholder (requires a .ass or .srt file)
-  // const subtitleFilter = `subtitles=captions.srt:force_style='Alignment=10,FontSize=24'`;
+
+
   
   const filterChain = `${cropFilter},${scaleFilter}`;
   

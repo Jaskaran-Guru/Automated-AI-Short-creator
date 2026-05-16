@@ -46,7 +46,6 @@ export async function POST(req: Request) {
       return new NextResponse("Video URL is required", { status: 400 });
     }
 
-    // Pre-check limits
     const estimatedMinutes = Math.ceil((estimatedDurationSeconds || 60) / 60);
     if (workspace.minutesUsed + estimatedMinutes > workspace.minutesLimit) {
       return NextResponse.json(
@@ -72,7 +71,6 @@ export async function POST(req: Request) {
       },
     });
 
-    // Enqueue the job for the worker to pick up
     try {
       if (!process.env.REDIS_URL) {
         console.warn("[QUEUE_WARNING] REDIS_URL not set. Video processing will not start automatically.");
@@ -88,7 +86,7 @@ export async function POST(req: Request) {
       }
     } catch (queueError) {
       console.error("[QUEUE_ADD_ERROR]", queueError);
-      // Don't throw here, let the project creation succeed so the user isn't stuck
+
     }
 
     await db.project.update({

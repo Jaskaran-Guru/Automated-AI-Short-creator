@@ -9,7 +9,6 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 
-// Load environment variables if running directly
 import dotenv from "dotenv";
 dotenv.config({ path: path.join(__dirname, "../.env") });
 dotenv.config({ path: path.join(__dirname, "../.env.local") });
@@ -43,15 +42,13 @@ const worker = new Worker(
     const audioPath = path.join(tempDir, `${job.id}_audio.mp3`);
 
     try {
-      // 1. Download Video
+
       console.log(`[Job ${job.id}] Downloading video...`);
       await downloadFile(videoUrl, videoPath);
 
-      // 2. Extract Audio
       console.log(`[Job ${job.id}] Extracting audio...`);
       await extractAudio(videoPath, audioPath);
 
-      // Verify and deduct usage
       const actualDuration = await getVideoDuration(videoPath);
       const consumedMinutes = Math.ceil(actualDuration / 60);
 
@@ -71,7 +68,6 @@ const worker = new Worker(
         });
       }
 
-      // Retry wrapper for AI calls
       const withRetry = async <T>(fn: () => Promise<T>, retries = 3): Promise<T> => {
         try {
           return await fn();
@@ -83,17 +79,14 @@ const worker = new Worker(
         }
       };
 
-      // 3. Transcribe Audio
       console.log(`[Job ${job.id}] Transcribing audio...`);
       const transcript = await withRetry(() => transcribeAudio(audioPath));
 
-      // 4. Find Viral Moments
       console.log(`[Job ${job.id}] Finding viral moments...`);
       const moments = await withRetry(() => findViralMoments(transcript, numShorts));
 
       console.log(`[Job ${job.id}] Found ${moments.length} moments.`);
 
-      // 5. Cut Clips & Upload
       for (let i = 0; i < moments.length; i++) {
         const moment = moments[i];
         console.log(`[Job ${job.id}] Cutting clip ${i + 1}/${moments.length}: ${moment.title}`);
@@ -127,11 +120,9 @@ const worker = new Worker(
           },
         });
 
-        // Cleanup clip
         if (fs.existsSync(clipPath)) fs.unlinkSync(clipPath);
       }
 
-      // 6. Update Project Status
       console.log(`[Job ${job.id}] Completing project...`);
       await db.project.update({
         where: { id: projectId },
@@ -151,7 +142,7 @@ const worker = new Worker(
       });
       throw error;
     } finally {
-      // Cleanup temp files
+
       if (fs.existsSync(videoPath)) fs.unlinkSync(videoPath);
       if (fs.existsSync(audioPath)) fs.unlinkSync(audioPath);
     }
@@ -162,7 +153,6 @@ const worker = new Worker(
 worker.on("ready", () => console.log("Worker is running and listening to 'video-processing' queue..."));
 worker.on("failed", (job, err) => console.error(`Job ${job?.id} failed with error:`, err));
 
-// 7. Social Post Processing (Mock)
 async function processScheduledPosts() {
   const now = new Date();
   try {
@@ -184,10 +174,8 @@ async function processScheduledPosts() {
           data: { status: "PROCESSING" }
         });
 
-        // Simulate publishing delay
         await new Promise(r => setTimeout(r, 3000));
 
-        // Mock platform IDs
         const platformPostId = "p_" + Math.random().toString(36).substring(7);
         
         await db.socialPost.update({
@@ -215,10 +203,8 @@ async function processScheduledPosts() {
   }
 }
 
-// Check every minute
 setInterval(processScheduledPosts, 60000);
 
-// Keep process alive
 process.on("SIGINT", async () => {
   await worker.close();
   process.exit(0);

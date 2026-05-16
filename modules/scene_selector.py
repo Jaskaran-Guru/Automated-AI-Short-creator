@@ -10,16 +10,12 @@ from modules.utils import log, seconds_to_hms
 import config
 
 
-# ─────────────────────────────────────────────────────────────
-# Types
-# ─────────────────────────────────────────────────────────────
+
 
 ClipWindow = Tuple[float, float]   # (start_sec, end_sec)
 
 
-# ─────────────────────────────────────────────────────────────
-# Core selector
-# ─────────────────────────────────────────────────────────────
+
 
 def select_clips(
     scores:         np.ndarray,
@@ -61,11 +57,9 @@ def select_clips(
         )
         return [(0.0, float(N / fps))]
 
-    # Sliding window sum → average score per window
     window_sums = np.convolve(scores, np.ones(W, dtype=np.float32), mode="valid")
     window_avgs = window_sums / W
 
-    # Candidate windows sorted by descending score
     sorted_starts = np.argsort(-window_avgs)   # descending
 
     selected: List[ClipWindow] = []
@@ -78,7 +72,6 @@ def select_clips(
         start_sec = start_sample / fps
         end_sec   = start_sec + clip_duration
 
-        # Check overlap with already-selected + gap buffer
         overlap = False
         for (s, e) in blocked_intervals:
             if start_sec < e + min_gap and end_sec > s - min_gap:
@@ -89,7 +82,6 @@ def select_clips(
             selected.append((start_sec, end_sec))
             blocked_intervals.append((start_sec, end_sec))
 
-    # Sort by start time for clean sequential output
     selected.sort(key=lambda x: x[0])
 
     for i, (s, e) in enumerate(selected, 1):

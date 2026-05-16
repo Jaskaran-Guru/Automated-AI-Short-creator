@@ -4,15 +4,12 @@ import io
 import subprocess
 from typing import List, Optional, Any
 
-# heavy imports moved inside functions
 
 from modules.utils import log, make_progress
 import config
 
 
-# ─────────────────────────────────────────────────────────────
-# Internal helpers
-# ─────────────────────────────────────────────────────────────
+
 
 def _load_clip_model():
     import torch
@@ -38,9 +35,7 @@ def _load_yolo_model():
     return YOLO(config.YOLO_MODEL_NAME)
 
 
-# ─────────────────────────────────────────────────────────────
-# Frame extraction via FFmpeg pipe
-# ─────────────────────────────────────────────────────────────
+
 
 def _extract_frames_pipe(video_path: str, fps: int = 1):
     from PIL import Image
@@ -60,15 +55,14 @@ def _extract_frames_pipe(video_path: str, fps: int = 1):
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     raw, errs = proc.communicate()
 
-    # JPEG frames are separated by the JPEG SOI/EOI markers
     frames: List[Image.Image] = []
     idx = 0
     while idx < len(raw):
-        # Find next SOI (0xFF 0xD8)
+
         soi = raw.find(b"\xff\xd8", idx)
         if soi == -1:
             break
-        # Find EOI (0xFF 0xD9) after SOI
+
         eoi = raw.find(b"\xff\xd9", soi)
         if eoi == -1:
             break
@@ -84,9 +78,7 @@ def _extract_frames_pipe(video_path: str, fps: int = 1):
     return frames
 
 
-# ─────────────────────────────────────────────────────────────
-# Individual scorers
-# ─────────────────────────────────────────────────────────────
+
 
 def _clip_scores(
     frames: List,
@@ -117,13 +109,13 @@ def _yolo_scores(frames: List, model) -> Any:
     scores = []
     for img in frames:
         results = model(img, verbose=False)
-        # Count detections; weigh by confidence
+
         detections = results[0].boxes
         if len(detections) == 0:
             scores.append(0.0)
         else:
             conf_sum = float(detections.conf.sum().item())
-            # Normalise to ~[0,1] (saturate at 5 high-conf detections)
+
             scores.append(min(1.0, conf_sum / 5.0))
     return np.array(scores, dtype=np.float32)
 
@@ -137,7 +129,7 @@ def _audio_energy_scores(audio_path: str, total_seconds: int) -> Any:
     hop_length   = sr
 
     rms = librosa.feature.rms(y=y, frame_length=frame_length, hop_length=hop_length)[0]
-    # Trim or pad to match total_seconds
+
     rms = rms[:total_seconds]
     if len(rms) < total_seconds:
         rms = np.pad(rms, (0, total_seconds - len(rms)))
@@ -148,9 +140,7 @@ def _audio_energy_scores(audio_path: str, total_seconds: int) -> Any:
     return rms.astype(np.float32)
 
 
-# ─────────────────────────────────────────────────────────────
-# Face centroid (used by video_cutter for smart crop)
-# ─────────────────────────────────────────────────────────────
+
 
 def get_face_centroids(frames: List, yolo_model) -> List[Optional[float]]:
     """
@@ -164,7 +154,7 @@ def get_face_centroids(frames: List, yolo_model) -> List[Optional[float]]:
         if len(boxes) == 0:
             centroids.append(None)
         else:
-            # Take the highest-confidence detection
+
             best_idx = int(boxes.conf.argmax())
             x1, y1, x2, y2 = boxes.xyxy[best_idx].tolist()
             cx = ((x1 + x2) / 2) / img.width
@@ -172,9 +162,7 @@ def get_face_centroids(frames: List, yolo_model) -> List[Optional[float]]:
     return centroids
 
 
-# ─────────────────────────────────────────────────────────────
-# Public API
-# ─────────────────────────────────────────────────────────────
+
 
 class ScoreResult:
     def __init__(
@@ -212,7 +200,6 @@ def score_video(
     frames = _extract_frames_pipe(video_path, fps=config.FRAME_SAMPLE_RATE)
     total  = len(frames)
 
-    # ── Audio Energy (always available) ──────────────────────
     log.info("Computing audio energy …")
     audio_scores = _audio_energy_scores(audio_path, total)
 
@@ -224,7 +211,6 @@ def score_video(
     w_yolo  = config.SCORE_WEIGHT_YOLO  if use_yolo  else 0.0
     w_audio = config.SCORE_WEIGHT_AUDIO
 
-    # ── CLIP ─────────────────────────────────────────────────
     if use_clip:
         try:
             log.info("Computing CLIP scores …")
@@ -237,7 +223,6 @@ def score_video(
             use_clip = False
             w_clip   = 0.0
 
-    # ── YOLO ─────────────────────────────────────────────────
     if use_yolo:
         try:
             log.info("Computing YOLO visual activity scores …")
@@ -250,7 +235,6 @@ def score_video(
             use_yolo = False
             w_yolo   = 0.0
 
-    # ── Normalise weights ─────────────────────────────────────
     total_w = w_clip + w_yolo + w_audio
     if total_w == 0:
         total_w = 1.0   # shouldn't happen, but guard against /0

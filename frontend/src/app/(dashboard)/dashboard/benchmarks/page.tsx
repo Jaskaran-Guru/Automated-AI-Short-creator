@@ -15,8 +15,7 @@ import { Progress } from "@/components/ui/progress";
 
 export default async function BenchmarksPage() {
   const { userId: clerkId } = await auth();
-  
-  // Mock benchmark data (In production, these come from BenchmarkSnapshot)
+
   const benchmarks = [
     { name: "Publishing Consistency", value: 88, avg: 42, unit: "%", description: "Creators in your niche average 3 posts per week." },
     { name: "Avg. Clip Length", value: 24, avg: 31, unit: "s", description: "Top 10% of creators use shorter 20-25s clips." },

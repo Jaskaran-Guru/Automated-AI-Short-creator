@@ -82,22 +82,22 @@ export default function LandingPage() {
   }, [isSignedIn])
 
   const handlePricingClick = (plan: string) => {
-    // If not signed in, go to signup
+
     if (!isSignedIn) {
       window.location.href = "/sign-up"
       return
     }
-    // If signed in, go to dashboard billing to complete checkout
+
     window.location.href = "/dashboard/billing"
   }
   return (
     <div className="flex flex-col min-h-screen relative overflow-hidden bg-[#020617]">
-      {/* Background Orbs */}
+      {}
       <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob"></div>
       <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob animation-delay-2000"></div>
       <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob animation-delay-4000"></div>
 
-      {/* Navigation */}
+      {}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full glass-dark mt-4 rounded-full border border-white/5">
         <div className="flex items-center gap-2">
           <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-1.5 rounded-lg">
@@ -118,7 +118,7 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {}
       <main className="flex-1 pt-40 pb-20 px-6">
         <div className="max-w-5xl mx-auto flex flex-col items-center text-center relative z-10">
           <motion.div
@@ -169,7 +169,7 @@ export default function LandingPage() {
             </Button>
           </motion.div>
 
-          {/* Social Proof */}
+          {}
           <motion.div 
             className="mt-20 flex flex-col items-center gap-6"
             initial={{ opacity: 0 }}
@@ -185,7 +185,7 @@ export default function LandingPage() {
           </motion.div>
         </div>
 
-        {/* Preview Image */}
+        {}
         <motion.div 
           className="mt-32 max-w-6xl mx-auto relative group"
           initial={{ opacity: 0, y: 40 }}
@@ -224,7 +224,7 @@ export default function LandingPage() {
         </motion.div>
       </main>
 
-      {/* Features Grid */}
+      {}
       <section id="features" className="py-32 px-6 max-w-7xl mx-auto w-full">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-2xl">
@@ -263,7 +263,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {}
       <section className="py-32 px-6 bg-slate-950/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
@@ -294,7 +294,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
+      {}
       <section id="pricing" className="py-32 px-6 max-w-7xl mx-auto w-full relative">
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-6xl font-black text-white mb-6">Simple, Transparent Pricing.</h2>
@@ -334,7 +334,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
+      {}
       <section id="faq" className="py-32 px-6 max-w-4xl mx-auto w-full">
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6">Frequently Asked Questions</h2>
@@ -359,7 +359,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Footer */}
+      {}
       <footer className="py-32 px-6 border-t border-slate-900 bg-[#020617] relative z-10">
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
           <div className="bg-blue-500/10 p-4 rounded-3xl mb-10">

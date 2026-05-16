@@ -2,7 +2,6 @@ import { supabase } from "./supabase"
 
 export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
 
-// --- Backend API Functions ---
 
 export async function uploadVideoToBackend(file: File) {
   const formData = new FormData()
@@ -54,7 +53,6 @@ export async function cancelProcessing(projectId: string) {
   return response.json()
 }
 
-// --- Projects CRUD ---
 
 export async function createProject(title: string, userId: string, projectId?: string) {
   const { data, error } = await supabase
@@ -87,7 +85,6 @@ export async function deleteProject(id: string) {
   return error == null
 }
 
-// --- Brand Kits (Templates) CRUD ---
 
 export interface BrandKit {
   id?: string
@@ -133,11 +130,10 @@ export async function deleteBrandKit(id: string) {
   return error == null
 }
 
-// --- Users (Admin) ---
 
 export async function getAllUsers() {
-  // Note: Depending on Supabase RLS policies, this usually requires a service_role key
-  // We mock it here for the UI if auth.users is restricted.
+
+
   const { data, error } = await supabase
     .from('auth.users') // or a custom public.profiles table
     .select('*')

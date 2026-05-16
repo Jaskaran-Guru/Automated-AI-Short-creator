@@ -1,7 +1,6 @@
 import os
 import sys
 
-# Add current dir to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 try:

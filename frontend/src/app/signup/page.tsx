@@ -35,7 +35,7 @@ export default function SignupPage() {
       if (signupError) {
         setError(signupError.message)
       } else if (data.user) {
-        // Check if email confirmation is required
+
         if (data.session) {
           router.push("/dashboard")
         } else {
@@ -52,7 +52,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      {/* Background Orbs */}
+      {}
       <div className="absolute top-1/4 -right-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob"></div>
       <div className="absolute bottom-1/4 -left-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob animation-delay-2000"></div>
 

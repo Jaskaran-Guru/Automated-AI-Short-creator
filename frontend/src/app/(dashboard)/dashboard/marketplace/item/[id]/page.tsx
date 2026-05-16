@@ -42,7 +42,6 @@ export default function ItemDetailPage() {
     checkPurchase();
   }, [id]);
 
-  // Mock data for the item
   const items: any = {
     "1": {
       name: "The 'High-Retention' Hook Pack",
@@ -119,7 +118,7 @@ export default function ItemDetailPage() {
       </Button>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        {/* Left Column: Info */}
+        {}
         <div className="lg:col-span-7 space-y-8">
            <div className="space-y-4">
               <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-4">Template Detail</Badge>
@@ -155,7 +154,7 @@ export default function ItemDetailPage() {
            </div>
         </div>
 
-        {/* Right Column: Checkout Card */}
+        {}
         <div className="lg:col-span-5">
            <Card className="bg-slate-900/80 border-slate-800 rounded-[3rem] p-10 glass-panel sticky top-8">
               <div className="flex items-center justify-between mb-8">

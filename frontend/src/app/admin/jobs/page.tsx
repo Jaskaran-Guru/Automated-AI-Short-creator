@@ -26,7 +26,6 @@ import { Badge } from "@/components/ui/badge";
 export default async function AdminJobsPage() {
   await protectAdminPage(["SUPER_ADMIN", "ADMIN", "OPS"]);
 
-  // Mock data for Queue Status (BullMQ Integration)
   const queues = [
     { name: "generate-clips", pending: 12, active: 4, failed: 1, successRate: 98.2 },
     { name: "render-short", pending: 5, active: 8, failed: 0, successRate: 100 },

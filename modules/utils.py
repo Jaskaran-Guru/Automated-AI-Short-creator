@@ -15,7 +15,6 @@ from rich.progress import (
     TextColumn, TimeElapsedColumn, TaskProgressColumn
 )
 
-# ── Console & Logger ──────────────────────────────────────────
 console = Console()
 
 logging.basicConfig(
@@ -26,8 +25,6 @@ logging.basicConfig(
 )
 log = logging.getLogger("shorts")
 
-
-# ── Progress Bar Factory ──────────────────────────────────────
 def make_progress() -> Progress:
     return Progress(
         SpinnerColumn(),
@@ -38,8 +35,6 @@ def make_progress() -> Progress:
         console=console,
     )
 
-
-# ── Temp Directory Management ─────────────────────────────────
 def ensure_dir(path: str) -> str:
     """Create directory if it doesn't exist, return path."""
     os.makedirs(path, exist_ok=True)
@@ -52,8 +47,6 @@ def clean_temp(temp_dir: str) -> None:
         shutil.rmtree(temp_dir, ignore_errors=True)
         log.info(f"Cleaned temp directory: {temp_dir}")
 
-
-# ── FFmpeg / FFprobe Helpers ──────────────────────────────────
 def check_ffmpeg(ffmpeg_bin: str = "ffmpeg", ffprobe_bin: str = "ffprobe") -> None:
     """Verify ffmpeg and ffprobe are on PATH; raise if not found."""
     for binary in (ffmpeg_bin, ffprobe_bin):
@@ -89,8 +82,6 @@ def run_ffprobe(args: list) -> subprocess.CompletedProcess:
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     return result
 
-
-# ── File Utilities ────────────────────────────────────────────
 def stem(path: str) -> str:
     """Return the stem (filename without extension) of a path."""
     return Path(path).stem

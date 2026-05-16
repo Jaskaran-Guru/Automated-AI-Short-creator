@@ -6,7 +6,7 @@ async function main() {
 
   try {
     await db.$transaction(async (tx) => {
-      // 1. Full Cleanup
+
       console.log('🧹 Clearing legacy data...')
       await tx.systemMetric.deleteMany({})
       await tx.lead.deleteMany({})
@@ -26,7 +26,6 @@ async function main() {
       await tx.auditLog.deleteMany({})
       await tx.user.deleteMany({})
 
-      // 2. Create the Founder (SuperAdmin)
       console.log('👑 Crowning the Founder...')
       const founder = await tx.user.create({
         data: {
@@ -37,7 +36,6 @@ async function main() {
         }
       })
 
-      // 3. Create Support & Ops Staff
       const support = await tx.user.create({
         data: {
           clerkId: "user_staff_support",
@@ -47,7 +45,6 @@ async function main() {
         }
       })
 
-      // 4. Create Historical Revenue Metrics (Last 12 Months)
       console.log('📈 Generating 12 months of revenue metrics...')
       for (let i = 0; i < 12; i++) {
         const date = new Date();
@@ -61,7 +58,6 @@ async function main() {
         });
       }
 
-      // 5. Create Growth CRM Leads
       console.log('💼 Building the B2B pipeline...')
       const leadStages = ["PROSPECT", "DEMO_BOOKED", "PROPOSAL", "CLOSED_WON"];
       const companies = ["HyperGrowth Media", "CreatorDAO", "ShortsKing Agency", "PodBlast Network"];
@@ -79,7 +75,6 @@ async function main() {
         })
       }
 
-      // 6. Create Support Tickets
       console.log('🎫 Populating the support queue...')
       const subjects = ["Billing issue", "Render failed at 90%", "Feature request: Subtitles", "Custom Font Upload"];
       for (let i = 0; i < subjects.length; i++) {
@@ -96,7 +91,6 @@ async function main() {
         })
       }
 
-      // 7. Create Risk Flags (Fraud Detection)
       console.log('🛡️ Deploying fraud detection...')
       await tx.riskFlag.create({
         data: {
@@ -106,7 +100,6 @@ async function main() {
         }
       })
 
-      // 8. Create a Demo Agency Workspace & Client (Legacy support)
       const workspace = await tx.workspace.create({
         data: {
           name: "Skyline Media (Demo)",
@@ -132,7 +125,6 @@ async function main() {
         }
       })
 
-      // 9. Initial Audit Log
       await tx.auditLog.create({
         data: {
           userId: founder.id,

@@ -30,7 +30,6 @@ export async function POST(req: Request) {
     const createdPosts = [];
     const baseDate = new Date(startDate);
 
-    // Schedule one clip every 48 hours to avoid spamming
     for (let i = 0; i < project.clips.length; i++) {
       const clip = project.clips[i];
       const scheduledFor = new Date(baseDate);

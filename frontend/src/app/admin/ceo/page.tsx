@@ -19,7 +19,6 @@ export default async function CEOMorningViewPage() {
   const todayStart = new Date(now);
   todayStart.setHours(0, 0, 0, 0);
 
-  // Pull live data
   const liveMetrics = await getOSMetrics();
   
   const [
@@ -122,7 +121,7 @@ export default async function CEOMorningViewPage() {
 
   return (
     <div className="p-8 max-w-[1600px] mx-auto">
-      {/* Header */}
+      {}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-12">
         <div>
           <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] mb-2">
@@ -148,7 +147,7 @@ export default async function CEOMorningViewPage() {
         </div>
       </div>
 
-      {/* MRR Pulse */}
+      {}
       <div className="grid md:grid-cols-3 gap-6 mb-10">
         <Card className="md:col-span-2 bg-gradient-to-br from-slate-900 to-slate-950 border-slate-800 p-8 rounded-[3rem] glass-panel relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 blur-3xl rounded-full" />
@@ -174,7 +173,7 @@ export default async function CEOMorningViewPage() {
                 <span className="text-xs text-slate-500 font-bold ml-1">MoM</span>
               </div>
             </div>
-            {/* Mini sparkline (static representation) */}
+            {}
             <div className="flex items-end gap-1 h-12">
               {[40, 52, 48, 61, 55, 70, 68, 75, 72, 80, 78, 85].map((h, i) => (
                 <div
@@ -230,7 +229,7 @@ export default async function CEOMorningViewPage() {
         </div>
       </div>
 
-      {/* Daily KPI Grid */}
+      {}
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-6 px-2">
           <Zap className="w-4 h-4 text-blue-500" />
@@ -273,7 +272,7 @@ export default async function CEOMorningViewPage() {
         </div>
       </div>
 
-      {/* Priority Actions */}
+      {}
       <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-[2.5rem] glass-panel border-l-4 border-l-red-500">
         <div className="flex items-center gap-3 mb-6">
           <AlertCircle className="w-5 h-5 text-red-500" />

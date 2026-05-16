@@ -58,7 +58,7 @@ export default function IntegrationsPage() {
 
   const handleConnect = (id: string) => {
     if (connected.includes(id)) {
-        // Disconnect logic
+
         if (confirm(`Do you want to disconnect ${id}?`)) {
             setConnected(prev => prev.filter(i => i !== id));
         }
@@ -66,7 +66,7 @@ export default function IntegrationsPage() {
     }
 
     setConnecting(id);
-    // Mocking an OAuth flow
+
     setTimeout(() => {
         setConnected(prev => [...prev, id]);
         setConnecting(null);

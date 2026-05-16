@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-# Force AI model caches to a local writable directory
+
 _base_dir = os.path.dirname(os.path.abspath(__file__))
 _cache_dir = os.path.join(_base_dir, ".cache")
 os.environ["XDG_CACHE_HOME"] = _cache_dir
@@ -15,9 +15,8 @@ import pipeline
 import config
 from modules.utils import ensure_dir
 
-# ─────────────────────────────────────────────────────────────
-# Page Configuration & Styling
-# ─────────────────────────────────────────────────────────────
+
+
 
 st.set_page_config(
     page_title="AI Video Shorts Creator",
@@ -26,7 +25,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Premium CSS for Glassmorphism, Dark Mode, and Vibrant Gradients
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
@@ -112,9 +110,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────────────────
-# Session State & Helpers
-# ─────────────────────────────────────────────────────────────
+
+
 
 if 'generated_shorts' not in st.session_state:
     st.session_state.generated_shorts = []
@@ -124,11 +121,10 @@ def progress_callback(stage, status, progress):
     st.session_state.progress_stage = stage
     st.session_state.progress_status = status
     st.session_state.progress_val = progress
-    # We use a placeholder for persistent status updates later
 
-# ─────────────────────────────────────────────────────────────
-# Sidebar — Configuration
-# ─────────────────────────────────────────────────────────────
+
+
+
 
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/video-editing.png", width=80)
@@ -154,9 +150,8 @@ with st.sidebar:
     else:
         st.warning("Running on CPU")
 
-# ─────────────────────────────────────────────────────────────
-# Main UI
-# ─────────────────────────────────────────────────────────────
+
+
 
 st.markdown('<h1 class="main-header">AI Video Shorts Creator</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Turn long videos into viral 9:16 shorts automatically.</p>', unsafe_allow_html=True)
@@ -164,7 +159,7 @@ st.markdown('<p class="sub-header">Turn long videos into viral 9:16 shorts autom
 uploaded_file = st.file_uploader("📂 Upload your video source (MP4, MKV, MOV)", type=["mp4", "mkv", "mov", "avi"])
 
 if uploaded_file is not None:
-    # Set up directories
+
     temp_input_path = Path("temp_inputs")
     ensure_dir(str(temp_input_path))
     video_path = temp_input_path / uploaded_file.name
@@ -181,8 +176,7 @@ if uploaded_file is not None:
     if start_btn:
         output_dir = os.path.join("output", Path(uploaded_file.name).stem)
         ensure_dir(output_dir)
-        
-        # UI Placeholders for progress
+
         progress_bar = st.progress(0)
         status_text = st.empty()
         log_expander = st.expander("Detailed Process Logs")
@@ -215,9 +209,8 @@ if uploaded_file is not None:
             st.error(f"Error during processing: {e}")
             st.exception(e)
 
-# ─────────────────────────────────────────────────────────────
-# Results Gallery
-# ─────────────────────────────────────────────────────────────
+
+
 
 if st.session_state.generated_shorts:
     st.markdown("---")
@@ -239,6 +232,5 @@ if st.session_state.generated_shorts:
                 )
             st.markdown('</div>', unsafe_allow_html=True)
 
-# Footer
 st.markdown("<br><br>", unsafe_allow_html=True)
 st.markdown('<div style="text-align: center; color: #64748b; font-size: 0.8rem;">Powered by Antigravity AI Engine</div>', unsafe_allow_html=True)

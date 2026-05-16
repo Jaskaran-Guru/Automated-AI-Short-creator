@@ -31,7 +31,7 @@ export default function AnnualReportPage() {
 
   return (
     <div className="bg-[#020617] min-h-screen text-white font-sans selection:bg-blue-500/30">
-      {/* Nav */}
+      {}
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-xl px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
@@ -47,7 +47,7 @@ export default function AnnualReportPage() {
         </div>
       </nav>
 
-      {/* Cover */}
+      {}
       <section className="pt-40 pb-24 px-6 relative overflow-hidden border-b border-white/5">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[700px] bg-blue-600/5 blur-[140px] rounded-full pointer-events-none" />
         <div className="max-w-5xl mx-auto relative z-10 text-center">
@@ -76,7 +76,7 @@ export default function AnnualReportPage() {
         </div>
       </section>
 
-      {/* Key Stats */}
+      {}
       <section className="py-24 px-6 border-b border-white/5">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-1">
@@ -91,7 +91,7 @@ export default function AnnualReportPage() {
         </div>
       </section>
 
-      {/* Executive Summary */}
+      {}
       <section className="py-32 px-6 max-w-4xl mx-auto">
         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mb-8">Executive Summary</p>
         <h2 className="text-4xl font-black text-white uppercase italic tracking-tighter leading-none mb-10">
@@ -110,7 +110,7 @@ export default function AnnualReportPage() {
         </div>
       </section>
 
-      {/* Niche Performance Table */}
+      {}
       <section className="py-24 px-6 bg-slate-950/50">
         <div className="max-w-5xl mx-auto">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-16">Section 2: Niche Performance Index</p>
@@ -132,7 +132,7 @@ export default function AnnualReportPage() {
         </div>
       </section>
 
-      {/* Key Finding Callout */}
+      {}
       <section className="py-32 px-6">
         <div className="max-w-4xl mx-auto">
           <Card className="bg-gradient-to-br from-blue-600 to-purple-700 p-16 rounded-[3rem] border-none relative overflow-hidden text-center">
@@ -148,7 +148,7 @@ export default function AnnualReportPage() {
         </div>
       </section>
 
-      {/* Download CTA */}
+      {}
       <section className="py-32 px-6 border-t border-white/5">
         <div className="max-w-3xl mx-auto text-center">
           <Globe className="w-12 h-12 text-slate-700 mx-auto mb-8" />

@@ -13,19 +13,19 @@ import { cn } from "@/lib/utils"
 import { UserButton } from "@clerk/nextjs"
 
 const menuItems = [
-  // Phase 9: Operating System
+
   { icon: Sunrise,         label: "CEO Morning",       href: "/admin/ceo" },
   { icon: LineChart,       label: "Forecast",          href: "/admin/forecast" },
   { icon: ClipboardList,   label: "Execution",         href: "/admin/execution" },
-  // Phase 8: Intelligence
+
   { icon: LayoutDashboard, label: "Executive",         href: "/admin" },
   { icon: Brain,           label: "Intelligence",      href: "/admin/intelligence" },
-  // Phase 7: Scale
+
   { icon: TrendingUp,      label: "Sales CRM",         href: "/admin/sales" },
   { icon: DollarSign,      label: "Finance",           href: "/admin/finance" },
   { icon: Heart,           label: "Customer Success",  href: "/admin/customer-success" },
   { icon: ShieldCheck,     label: "Enterprise",        href: "/admin/enterprise" },
-  // Phase 5: Operations
+
   { icon: Users,           label: "Users",             href: "/admin/users" },
   { icon: CreditCard,      label: "Billing Ops",       href: "/admin/billing" },
   { icon: MessageSquare,   label: "Support Desk",      href: "/admin/tickets" },

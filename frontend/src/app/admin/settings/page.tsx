@@ -33,7 +33,7 @@ export default async function AdminSettingsPage() {
 
       <div className="grid gap-8">
         <div className="grid md:grid-cols-2 gap-8">
-            {/* Security & Access */}
+            {}
             <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-[2.5rem] glass-panel">
                 <div className="flex items-center gap-3 mb-8">
                     <Lock className="w-5 h-5 text-red-500" />
@@ -64,7 +64,7 @@ export default async function AdminSettingsPage() {
                 </div>
             </Card>
 
-            {/* AI Core Engine */}
+            {}
             <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-[2.5rem] glass-panel">
                 <div className="flex items-center gap-3 mb-8">
                     <Cpu className="w-5 h-5 text-blue-500" />
@@ -90,7 +90,7 @@ export default async function AdminSettingsPage() {
             </Card>
         </div>
 
-        {/* Infrastructure & Queues */}
+        {}
         <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-[3rem] glass-panel border-dashed">
             <div className="flex items-center gap-3 mb-8">
                 <Database className="w-5 h-5 text-emerald-500" />

@@ -7,12 +7,11 @@ import shutil
 import subprocess
 from pathlib import Path
 
-# ── Console & Logger (No-Rich Fallback) ────────────────────────
 class SimpleConsole:
     def print(self, *args, **kwargs):
         import re
         msg = str(args[0]) if args else ""
-        # Strip potential rich tags
+
         msg = re.sub(r"\[/?.*?\]", "", msg)
         print(msg)
     def rule(self, text=""):
@@ -28,8 +27,6 @@ logging.basicConfig(
 )
 log = logging.getLogger("shorts")
 
-
-# ── Progress Bar Factory (No-Rich Fallback) ────────────────────
 def make_progress() -> Any:
     class SimpleProgress:
         def __enter__(self): return self
@@ -41,8 +38,6 @@ def make_progress() -> Any:
         def advance(self, *args, **kwargs): pass
     return SimpleProgress()
 
-
-# ── Temp Directory Management ─────────────────────────────────
 def ensure_dir(path: str) -> str:
     """Create directory if it doesn't exist, return path."""
     os.makedirs(path, exist_ok=True)
@@ -55,8 +50,6 @@ def clean_temp(temp_dir: str) -> None:
         shutil.rmtree(temp_dir, ignore_errors=True)
         log.info(f"Cleaned temp directory: {temp_dir}")
 
-
-# ── FFmpeg / FFprobe Helpers ──────────────────────────────────
 def check_ffmpeg(ffmpeg_bin: str = "ffmpeg", ffprobe_bin: str = "ffprobe") -> None:
     """Verify ffmpeg and ffprobe are on PATH; raise if not found."""
     for binary in (ffmpeg_bin, ffprobe_bin):
@@ -89,8 +82,6 @@ def run_ffprobe(args: list) -> subprocess.CompletedProcess:
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     return result
 
-
-# ── File Utilities ────────────────────────────────────────────
 def stem(path: str) -> str:
     """Return the stem (filename without extension) of a path."""
     return Path(path).stem

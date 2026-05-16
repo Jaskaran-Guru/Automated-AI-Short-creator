@@ -1,12 +1,7 @@
-﻿/**
- * VIRAIL Sales Machine
- * Standardized scripts, scoring, and playbooks for repeatable sales.
- * Goal: Remove rep-to-rep variance. Every deal is handled the same way.
- */
+﻿
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// DEAL SCORING SYSTEM
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+
 
 export interface DealScoringInput {
   companySize: "SOLO" | "SMALL" | "AGENCY" | "ENTERPRISE";
@@ -33,23 +28,19 @@ export function scoreDeal(input: DealScoringInput): DealScore {
   const breakdowns: Record<string, number> = {};
   let total = 0;
 
-  // Intent signals
   if (input.inboundLead)          { breakdowns["Inbound Lead"] = 20; total += 20; }
   if (input.hasTrialed)           { breakdowns["Started Trial"] = 15; total += 15; }
   if (input.demoAttended)         { breakdowns["Demo Attended"] = 20; total += 20; }
   if (input.repliedToOutreach)    { breakdowns["Replied Outreach"] = 10; total += 10; }
   if (input.openedEmailCount > 3) { breakdowns["High Email Engagement"] = 5; total += 5; }
 
-  // Qualification signals
   if (input.budgetConfirmed)      { breakdowns["Budget Confirmed"] = 15; total += 15; }
   if (input.decisionMakerReached) { breakdowns["DM Reached"] = 10; total += 10; }
 
-  // Company size weight
   const sizeScore = { SOLO: 1, SMALL: 3, AGENCY: 8, ENTERPRISE: 10 };
   const accountSize = sizeScore[input.companySize];
   breakdowns["Account Size"] = accountSize;
 
-  // Urgency (decays with pipeline age)
   const urgency = Math.max(0, 10 - Math.floor(input.daysInPipeline / 5));
   breakdowns["Urgency (days decay)"] = urgency;
 
@@ -70,9 +61,8 @@ export function scoreDeal(input: DealScoringInput): DealScore {
   return { total, likelihood, urgency, accountSize, breakdowns, nextAction: nextActionMap[likelihood] };
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// OUTREACH SCRIPTS LIBRARY
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+
 
 export const SCRIPTS = {
 

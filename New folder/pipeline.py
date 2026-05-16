@@ -10,9 +10,7 @@ from modules.utils import (
 import config
 
 
-# ─────────────────────────────────────────────────────────────
-# Pipeline
-# ─────────────────────────────────────────────────────────────
+
 
 def run(
     video_path:      str,
@@ -31,7 +29,6 @@ def run(
     import time
     from typing import Optional
 
-    # Stage modules (Lazy Load)
     from modules.audio_extractor import list_audio_tracks, select_audio_track, extract_audio
     from modules.transcriber     import transcribe, words_to_srt
     from modules.scene_scorer    import score_video
@@ -44,7 +41,6 @@ def run(
 
     t0 = time.time()
 
-    # ── Validate ─────────────────────────────────────────────
     check_ffmpeg()
     if not os.path.isfile(video_path):
         raise FileNotFoundError(f"Video not found: {video_path}")
@@ -53,7 +49,6 @@ def run(
 
     ensure_dir(output_dir)
 
-    # All temp files go here
     temp_dir = os.path.join(output_dir, ".temp_pipeline")
     ensure_dir(temp_dir)
 
@@ -66,22 +61,18 @@ def run(
         f"Whisper: {whisper_model}"
     )
 
-    # ── Stage 1: Audio extraction ─────────────────────────────
     console.rule("Stage 1 · Audio Extraction")
     tracks      = list_audio_tracks(video_path)
     track_index = select_audio_track(tracks, interactive=interactive)
     wav_path    = os.path.join(temp_dir, "audio.wav")
     extract_audio(video_path, wav_path, track_index=track_index)
 
-    # ── Stage 2: Transcription ────────────────────────────────
     console.rule("Stage 2 · Whisper Transcription")
     words = transcribe(wav_path, model_name=whisper_model)
 
-    # Write full SRT for reference alongside the output
     srt_path = os.path.join(output_dir, "full_transcript.srt")
     words_to_srt(words, srt_path)
 
-    # ── Stage 3: Scene Scoring ────────────────────────────────
     console.rule("Stage 3 · AI Scene Scoring")
     score_result = score_video(
         video_path=video_path,
@@ -90,7 +81,6 @@ def run(
         use_yolo=True,
     )
 
-    # ── Stage 4: Clip Selection ────────────────────────────────
     console.rule("Stage 4 · Selecting Best Moments")
     clips = select_clips(
         scores=score_result.composite,
@@ -102,12 +92,10 @@ def run(
         log.error("No clips could be selected. Aborting.")
         return []
 
-    # Print selection table
     console.print("\nSelected Clips:")
     for i, (s, e) in enumerate(clips, 1):
         print(f"  #{i}: {s:.1f}s - {e:.1f}s ({format_duration(e - s)})")
 
-    # ── Stage 5 & 6: Cut, Crop, Caption ───────────────────────
     console.rule("Stage 5 · Cutting, Cropping & Captioning")
 
     output_paths: list[str] = []
@@ -119,12 +107,10 @@ def run(
     for i, (start_sec, end_sec) in enumerate(clips, 1):
         console.print(f"Short {i} / {len(clips)}")
 
-        # Determine face centroid at the midpoint of the clip
         mid_sec = int((start_sec + end_sec) / 2)
         ctr_idx = min(mid_sec, len(score_result.centroids) - 1)
         face_cx: Optional[float] = score_result.centroids[ctr_idx]
 
-        # --- Step A: Cut & smart-crop → vertical clip
         raw_path = os.path.join(raw_clips_dir, f"raw_short_{i:02d}.mp4")
         cut_and_crop(
             video_path=video_path,
@@ -135,7 +121,6 @@ def run(
             add_blur_bg=True,
         )
 
-        # --- Step B: Burn captions
         final_path = os.path.join(output_dir, f"short_{i:02d}.mp4")
         render_captions(
             clip_path=raw_path,
@@ -148,13 +133,11 @@ def run(
         )
         output_paths.append(final_path)
 
-    # ── Stage 7: Cleanup ──────────────────────────────────────
     if not keep_temp:
         clean_temp(temp_dir)
 
     elapsed = time.time() - t0
 
-    # ── Summary ───────────────────────────────────────────────
     console.print(
         f"\nDone! Created {len(output_paths)} short(s) in {elapsed:.1f}s\n"
         + "\n".join(f"  {p}" for p in output_paths)

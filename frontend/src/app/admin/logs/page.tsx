@@ -126,7 +126,7 @@ export default async function AdminLogsPage() {
         </Table>
       </Card>
 
-      {/* Internal Note */}
+      {}
       <div className="mt-8 p-6 rounded-[2rem] bg-slate-900/30 border border-slate-800 border-dashed flex items-center gap-4">
           <div className="bg-slate-800 p-3 rounded-2xl">
               <ShieldAlert className="w-6 h-6 text-slate-500" />

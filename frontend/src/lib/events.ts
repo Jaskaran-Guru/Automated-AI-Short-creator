@@ -29,10 +29,7 @@ interface TrackEventProps {
   metadata?: Record<string, any>;
 }
 
-/**
- * Tracks a user behavioral event in the VIRAIL Moat Engine.
- * Used for building recommendations and churn detection.
- */
+
 export async function trackEvent({
   event,
   workspaceId,
@@ -66,10 +63,8 @@ export async function trackEvent({
   }
 }
 
-/**
- * Client-safe event logging (via API route)
- */
+
 export async function trackClientEvent(props: TrackEventProps) {
-    // In production, this would call /api/events
+
     return trackEvent(props);
 }

@@ -28,7 +28,6 @@ export default async function CalendarPage({
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
   const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
 
-  // Fetch all posts for this workspace/month
   const posts = await db.socialPost.findMany({
     where: {
       client: { workspaceId: workspace.id },
@@ -45,17 +44,14 @@ export default async function CalendarPage({
     orderBy: { scheduledFor: "asc" }
   });
 
-  // Calendar logic
   const daysInMonth = lastDayOfMonth.getDate();
   const startingDay = firstDayOfMonth.getDay();
   const calendarDays = [];
 
-  // Add empty slots for days of previous month
   for (let i = 0; i < startingDay; i++) {
     calendarDays.push(null);
   }
 
-  // Add actual days
   for (let i = 1; i <= daysInMonth; i++) {
     calendarDays.push(i);
   }

@@ -12,9 +12,7 @@ from modules.transcriber import WordEntry, words_to_ass, words_in_window
 import config
 
 
-# ─────────────────────────────────────────────────────────────
-# Public API
-# ─────────────────────────────────────────────────────────────
+
 
 def render_captions(
     clip_path:   str,
@@ -48,7 +46,6 @@ def render_captions(
     basename   = os.path.splitext(os.path.basename(clip_path))[0]
     ass_path   = os.path.join(ass_dir, f"{basename}.ass")
 
-    # ── Build ASS file relative to the clip's timeline ──────
     clip_words = words_in_window(words, clip_start, clip_end)
 
     if not clip_words:
@@ -64,8 +61,7 @@ def render_captions(
         clip_start=clip_start,
     )
 
-    # ── Escape path for FFmpeg filter on Windows ─────────────
-    # Forward slashes and escaped colons are required inside vf filter strings
+
     ass_escaped = ass_path.replace("\\", "/").replace(":", "\\:")
 
     vf = f"ass='{ass_escaped}'"

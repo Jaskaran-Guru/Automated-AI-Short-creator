@@ -75,10 +75,9 @@ export async function findViralMoments(transcript: string, numShorts: number = 3
   
   try {
     const parsed = JSON.parse(content);
-    // Standardize object format
+
     const toValidate = Array.isArray(parsed) ? { moments: parsed } : (parsed.moments ? parsed : { moments: [parsed] });
-    
-    // Validate with Zod
+
     const validated = AIResponseSchema.parse(toValidate);
     return validated.moments;
   } catch(e) {

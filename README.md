@@ -1,142 +1,64 @@
----
-title: Virail
-emoji: 🎬
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-pinned: false
-app_port: 7860
----
+# Virail
 
-# AI Video Shorts Creator
+Virail is an AI-based video automation system designed to streamline the production of vertical short-form content. Utilizing advanced machine learning models and audio-visual processing, Virail automatically identifies the most engaging moments from long-form videos and reframes them into high-quality, 9:16 shorts complete with burned-in animated captions.
 
-> **AI-Based Video Automation System** | Python · Whisper · YOLO · CLIP · FFmpeg  
-> Automatically cuts the *best moments* from any video and produces vertical short-form clips with burned-in animated captions — no manual editing needed.
+## Core Capabilities
 
----
+* Speech Recognition: Employs OpenAI Whisper for accurate, multi-language speech-to-text generation and automatic language detection.
+* Scene Scoring: Utilizes a composite scoring mechanism combining semantic relevance via CLIP, visual activity via YOLOv8, and audio energy analysis.
+* Intelligent Extraction: Automatically selects the top non-overlapping moments to ensure maximum engagement.
+* Format Optimization: Reframes content to 1080x1920 resolution, employing face-centered cropping and blurred background padding to eliminate black bars.
+* Dynamic Captions: Generates word-by-word karaoke-style animated captions.
+* Multi-Audio Track Processing: Automatically detects multiple audio tracks and allows for selective track extraction.
+* Hardware Acceleration: Automatically scales to utilize CUDA-enabled GPUs for accelerated processing while maintaining CPU fallback capabilities.
 
-## ✨ Features
+## System Prerequisites
 
-| Feature | Detail |
-|---|---|
-| 🎙️ **Speech Recognition** | OpenAI Whisper — any language, auto-detected |
-| 🖼️ **Scene Scoring** | CLIP (semantic) + YOLOv8 (visual activity) + audio energy |
-| ✂️ **Smart Cut** | Picks top-N non-overlapping best moments |
-| 📱 **Vertical Format** | Auto-reframes to 9:16 (1080×1920) with face-centred crop + blur background |
-| 💬 **Animated Captions** | Word-by-word karaoke-style highlight (TikTok style) |
-| 🎵 **Multi-Audio** | Detects and lets you select from dual/multi audio tracks |
-| ⚡ **GPU / CPU** | Automatically uses CUDA if available, falls back to CPU |
+To ensure optimal performance and compatibility, verify that your environment meets the following requirements:
 
----
+* Python: Version 3.9 or higher.
+* FFmpeg: Installed and globally accessible via the system PATH environment variable.
+* Hardware: A CUDA-enabled NVIDIA GPU is highly recommended for accelerated model inference.
 
-## 📦 Requirements
+## Installation Guide
 
-- Python ≥ 3.9
-- FFmpeg (must be on PATH) → [Download here](https://ffmpeg.org/download.html)
-- pip packages (see `requirements.txt`)
+Follow these steps to configure the Virail environment:
 
----
+1. Clone the repository to your local machine and navigate to the project directory.
+2. Initialize and activate a Python virtual environment to isolate project dependencies.
+3. Install the required base dependencies executing the package installer with the requirements file.
+4. For GPU acceleration, install the CUDA-compatible PyTorch distribution directly from the official PyTorch repository.
 
-## 🚀 Setup
+## Usage Instructions
 
-```bash
-# 1. Clone / open the project folder
-cd "d:\Projects\youtubeshorts\New folder"
+Virail provides two modes of operation: interactive and non-interactive.
 
-# 2. Create a virtual environment (recommended)
-python -m venv venv
-venv\Scripts\activate        # Windows
+### Interactive Execution
 
-# 3. Install dependencies
-pip install -r requirements.txt
+Launch the primary script without arguments to enter interactive mode. The system will prompt you for necessary configuration details including the input video path, desired output directory, number of clips to generate, target duration for each clip, transcription model size, and caption styling preferences.
 
-# 4. (GPU users) Install CUDA-enabled PyTorch instead:
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-```
+### Non-Interactive Execution
 
----
+For automated workflows, you can supply all configuration parameters directly via command-line arguments. Key parameters include:
+* input: Path to the source video file.
+* output: Designated directory for the generated shorts.
+* num_shorts: The total number of clips to produce.
+* duration: The maximum length of each generated clip in seconds.
+* model: The specific Whisper model variant to employ for transcription.
 
-## 🎬 Usage
+## Repository Structure
 
-### Interactive Mode (recommended)
-```bash
-python main.py
-```
-You'll be prompted step-by-step for:
-- Video file path  
-- Output folder  
-- Number of shorts (1–20)  
-- Duration per short (15 / 30 / 45 / 60s or custom)  
-- Whisper model size  
-- Caption style
+The architecture is modular, separating orchestration, configuration, and specialized processing modules:
 
-### Non-Interactive / Batch Mode
-```bash
-python main.py --input my_video.mp4 --num_shorts 3 --duration 30
-```
+* The root directory contains the entry point, the primary pipeline orchestrator, and the global configuration registry.
+* The modules directory encapsulates discrete processing stages, including audio extraction, asynchronous transcription, composite scene scoring, algorithmic scene selection, FFmpeg-based video cutting, and subtitle rendering.
 
-**All flags:**
-```
-  -i / --input         Path to source video
-  -o / --output        Output directory (default: video_dir/output)
-  -n / --num_shorts    Number of shorts to generate (default: 3)
-  -d / --duration      Duration of each short in seconds (default: 30)
-  -m / --model         Whisper model: base|small|medium|large|large-v2 (default: small)
-  --caption_style      word_highlight | full_line (default: word_highlight)
-  --no_interactive     Skip audio-track selection prompt
-  --keep_temp          Keep temp files for debugging
-```
+## Configuration Parameters
 
----
+System behavior can be modified by adjusting variables within the configuration file. Notable parameters include model selection for Whisper, CLIP, and YOLO, as well as the relative weights assigned to semantic, visual, and audio scores during the scene evaluation phase. Output resolution and caption styling are also configurable.
 
-## 📁 Project Structure
+## Troubleshooting
 
-```
-├── main.py               # CLI entry point
-├── pipeline.py           # Orchestrates all stages
-├── config.py             # Global settings
-├── requirements.txt
-├── modules/
-│   ├── audio_extractor.py  # Multi-track audio detection & extraction
-│   ├── transcriber.py      # Whisper ASR → word timestamps, SRT, ASS
-│   ├── scene_scorer.py     # CLIP + YOLO + librosa composite scoring
-│   ├── scene_selector.py   # Sliding-window best-moment selection
-│   ├── video_cutter.py     # Trim + 9:16 smart-crop with blur bg
-│   ├── caption_renderer.py # Burn ASS karaoke captions with FFmpeg
-│   └── utils.py            # Logging, progress bars, FFmpeg helpers
-└── output/               # Generated shorts appear here
-    ├── short_01.mp4
-    ├── short_02.mp4
-    └── full_transcript.srt
-```
-
----
-
-## ⚙️ Configuration (`config.py`)
-
-You can tweak defaults without touching the source:
-
-| Setting | Default | Description |
-|---|---|---|
-| `WHISPER_MODEL` | `"small"` | Whisper model size |
-| `CLIP_MODEL_NAME` | `"ViT-B/32"` | CLIP backbone |
-| `YOLO_MODEL_NAME` | `"yolov8n.pt"` | YOLO variant |
-| `SCORE_WEIGHT_CLIP` | `0.40` | Weight of CLIP in composite score |
-| `SCORE_WEIGHT_YOLO` | `0.35` | Weight of YOLO in composite score |
-| `SCORE_WEIGHT_AUDIO` | `0.25` | Weight of audio energy |
-| `SHORT_WIDTH/HEIGHT` | `1080 × 1920` | Output resolution |
-| `CAPTION_STYLE` | `word_highlight` | Subtitle style |
-| `CAPTION_FONT` | `Arial` | Caption font |
-
----
-
-## 🔧 Troubleshooting
-
-| Issue | Fix |
-|---|---|
-| `ffmpeg not found` | Install FFmpeg & add to PATH |
-| CUDA OOM | Use a smaller Whisper model (`base`) or run on CPU |
-| No words in clip | Video may be silent; captions will be skipped gracefully |
-| Black bars in output | Set `add_blur_bg=True` in `video_cutter.cut_and_crop()` (default) |
-
-
+* FFmpeg Errors: Ensure the FFmpeg binary is correctly installed and its directory is appended to the system PATH.
+* Memory Allocation Exceptions: If utilizing a GPU with limited VRAM, select a smaller Whisper model variant or execute the application using the CPU fallback mode.
+* Uncaptioned Output: If the source video lacks audible speech, the system will bypass the captioning stage while still performing visual scene extraction.

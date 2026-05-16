@@ -5,7 +5,7 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY || "re_mock_key");
 
 export async function GET(req: Request) {
-  // Simple auth to ensure only authorized callers (like Vercel Cron) can trigger this
+
   const authHeader = req.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new NextResponse("Unauthorized", { status: 401 });
@@ -36,7 +36,7 @@ export async function GET(req: Request) {
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
     for (const user of users) {
-      // Aggregate stats across all user workspaces
+
       let weeklyClipsCount = 0;
       let topScore = 0;
       let totalMinutesUsed = 0;

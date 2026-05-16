@@ -11,7 +11,6 @@ export async function POST() {
     const workspace = await getCurrentWorkspace();
     if (!workspace) return new NextResponse("Workspace not found", { status: 404 });
 
-    // Aggregate stats for the current month
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -29,7 +28,6 @@ export async function POST() {
       }
     });
 
-    // Mock calculations for demo
     const timeSavedHours = clipsCount * 2; // Assuming 2 hours saved per clip
     const growthScore = Math.min(100, 70 + (clipsCount * 2));
 
@@ -41,7 +39,6 @@ export async function POST() {
       creator: (await db.user.findUnique({ where: { clerkId } }))?.name || "User"
     };
 
-    // Store or update report
     const report = await db.report.upsert({
       where: {
         shareToken: `report-${workspace.id}-${now.getMonth() + 1}-${now.getFullYear()}`

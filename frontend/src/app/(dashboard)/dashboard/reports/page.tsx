@@ -35,7 +35,6 @@ export default async function ReportsPage({
     orderBy: { createdAt: "desc" }
   }) : [];
 
-  // Stats for the active client (Current Month)
   const stats = activeClientId ? {
     clips: await db.clip.count({ where: { clientId: activeClientId } }),
     posts: await db.socialPost.count({ where: { clientId: activeClientId, status: "PUBLISHED" } }),

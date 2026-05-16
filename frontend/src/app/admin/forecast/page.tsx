@@ -38,7 +38,7 @@ export default async function ForecastPage() {
         </Badge>
       </div>
 
-      {/* Projections */}
+      {}
       <div className="grid md:grid-cols-2 gap-6 mb-10">
         <Card className="bg-gradient-to-br from-blue-600/20 to-blue-900/10 border-blue-500/20 p-10 rounded-[3rem] glass-panel">
           <TrendingUp className="w-8 h-8 text-blue-500 mb-6" />
@@ -69,7 +69,7 @@ export default async function ForecastPage() {
         </Card>
       </div>
 
-      {/* Risk Flags */}
+      {}
       {projection.riskFlags.length > 0 && (
         <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-[2.5rem] glass-panel mb-8">
           <h3 className="text-[10px] font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
@@ -106,7 +106,7 @@ export default async function ForecastPage() {
         </Card>
       )}
 
-      {/* Sensitivity Analysis */}
+      {}
       <Card className="bg-slate-900/50 border-slate-800 rounded-[2.5rem] overflow-hidden glass-panel">
         <div className="p-8 border-b border-slate-800 bg-slate-900/30">
           <h3 className="text-[10px] font-black text-white uppercase tracking-widest">Sensitivity Analysis â€” 30-Day Scenarios</h3>

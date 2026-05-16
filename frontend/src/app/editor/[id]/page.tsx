@@ -22,7 +22,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     async function fetchProject() {
       try {
-        // Here we assume params.id is the backend project_id
+
         const data = await getProjectStatus(params.id)
         setProject(data)
       } catch (error) {
@@ -49,7 +49,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="flex flex-col h-screen bg-slate-950 overflow-hidden">
-      {/* Top Navbar */}
+      {}
       <header className="h-16 border-b border-slate-800 bg-slate-950 flex items-center justify-between px-6 shrink-0">
         <div className="flex items-center gap-4">
           <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -97,10 +97,10 @@ export default function EditorPage({ params }: { params: { id: string } }) {
           </Button>
       </header>
 
-      {/* Main Workspace */}
+      {}
       <div className="flex flex-1 overflow-hidden">
         
-        {/* Left: Video Preview (9:16) */}
+        {}
         <div className="flex-1 border-r border-slate-800 bg-slate-900/50 flex items-center justify-center p-8 relative">
           <div className="aspect-[9/16] h-full max-h-[75vh] bg-black rounded-xl overflow-hidden relative shadow-2xl border border-slate-800 group">
             
@@ -115,14 +115,14 @@ export default function EditorPage({ params }: { params: { id: string } }) {
               <img src={videoUrl} className="w-full h-full object-cover opacity-80" alt="Video Preview" />
             )}
             
-            {/* Active Caption Overlay (Simplified mock for now) */}
+            {}
             <div className="absolute bottom-32 left-0 right-0 text-center px-8 z-10">
               <span className="text-3xl font-black text-white uppercase tracking-tight drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]" style={{ fontFamily: 'Impact, sans-serif' }}>
                 <span className="text-yellow-400">THE SECRET</span> TO HIGH GROWTH
               </span>
             </div>
 
-            {/* Video Controls Overlay */}
+            {}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-slate-900/80 backdrop-blur-md px-6 py-3 rounded-full border border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity">
               <button className="text-slate-300 hover:text-white"><SkipBack className="w-5 h-5" /></button>
               <button 
@@ -136,7 +136,7 @@ export default function EditorPage({ params }: { params: { id: string } }) {
           </div>
         </div>
 
-        {/* Right: Tools & Settings */}
+        {}
         <div className="w-96 bg-slate-950 flex flex-col shrink-0">
           <div className="flex border-b border-slate-800 p-2 gap-2 shrink-0">
             {[
@@ -214,9 +214,9 @@ export default function EditorPage({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      {/* Bottom Timeline */}
+      {}
       <div className="h-48 border-t border-slate-800 bg-slate-900 shrink-0 flex flex-col">
-        {/* Timeline Header Tools */}
+        {}
         <div className="flex items-center px-4 h-10 border-b border-slate-800 gap-4 shrink-0">
           <button className="text-slate-400 hover:text-white p-1"><Scissors className="w-4 h-4" /></button>
           <div className="h-4 w-[1px] bg-slate-700"></div>
@@ -226,24 +226,24 @@ export default function EditorPage({ params }: { params: { id: string } }) {
           </div>
         </div>
         
-        {/* Tracks Area */}
+        {}
         <div className="flex-1 overflow-x-auto relative bg-slate-950 p-4">
-          {/* Playhead */}
+          {}
           <div className="absolute top-0 bottom-0 w-[1px] bg-red-500 z-20 left-[20%]" style={{boxShadow: '0 0 10px rgba(239,68,68,0.5)'}}>
             <div className="w-3 h-3 bg-red-500 rounded-sm absolute top-0 -translate-x-1/2"></div>
           </div>
           
           <div className="space-y-2 w-[200%]">
-            {/* Video Track */}
+            {}
             <div className="h-10 bg-slate-800 rounded-md border border-slate-700 flex items-center overflow-hidden">
                <div className="h-full w-full bg-blue-900/20 border-r border-slate-700 p-1 flex">
-                 {/* Thumbnails placeholder */}
+                 {}
                  {[1,2,3,4,5,6].map(i => (
                    <div key={i} className="h-full w-20 bg-slate-700/50 mr-1 rounded-sm"></div>
                  ))}
                </div>
             </div>
-            {/* Caption Track */}
+            {}
             <div className="h-8 bg-slate-800/50 rounded-md border border-slate-700 flex relative overflow-hidden">
               {captions.map((cap, i) => (
                 <div 

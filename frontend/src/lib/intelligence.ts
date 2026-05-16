@@ -1,11 +1,9 @@
 import { db } from "@/lib/prisma";
 
-/**
- * The Intelligence Engine analyzes user behavioral patterns to generate recommendations.
- */
+
 export async function generateUserRecommendations(userId: string) {
   try {
-    // 1. Fetch recent events for context
+
     const recentEvents = await (db as any).eventLog.findMany({
       where: { userId },
       orderBy: { timestamp: 'desc' },
@@ -14,7 +12,6 @@ export async function generateUserRecommendations(userId: string) {
 
     if (recentEvents.length === 0) return;
 
-    // 2. Sample Logic: Inconsistent Posting Detection
     const schedules = recentEvents.filter((e: any) => e.eventName === 'clip_scheduled');
     if (schedules.length > 0 && schedules.length < 3) {
         await (db as any).recommendation.upsert({
@@ -29,8 +26,7 @@ export async function generateUserRecommendations(userId: string) {
         });
     }
 
-    // 3. Sample Logic: Posting Window Optimization
-    // In production, we'd analyze timestamp distributions
+
     await (db as any).recommendation.upsert({
         where: { id: `window_${userId}` },
         update: {},

@@ -23,7 +23,6 @@ interface NudgeProps {
 export function GrowthNudges() {
   const [isVisible, setIsVisible] = useState(true)
 
-  // In production, these would be fetched based on user state
   const nudges: NudgeProps[] = [
     {
         type: 'UPSELL',

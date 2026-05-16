@@ -19,7 +19,6 @@ export default async function CustomerSuccessPage() {
     orderBy: { updatedAt: 'desc' },
   });
 
-  // Health segmentation from real data
   const segments = {
     CHAMPION: users.filter(u => healthReports.find(r => r.userId === u.id)?.tier === "CHAMPION"),
     HEALTHY:  users.filter(u => healthReports.find(r => r.userId === u.id)?.tier === "HEALTHY"),
@@ -64,7 +63,7 @@ export default async function CustomerSuccessPage() {
         </Button>
       </div>
 
-      {/* Segment Summary */}
+      {}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         {(Object.keys(segmentConfig) as Tier[]).map((tier) => {
           const cfg = segmentConfig[tier];
@@ -81,7 +80,7 @@ export default async function CustomerSuccessPage() {
         })}
       </div>
 
-      {/* Priority Action List â€” CRITICAL + AT_RISK */}
+      {}
       <div className="space-y-8">
         {(["CRITICAL", "AT_RISK"] as Tier[]).map((tier) => (
           <div key={tier}>

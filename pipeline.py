@@ -33,9 +33,7 @@ from modules.caption_renderer import render_captions
 import config
 
 
-# ─────────────────────────────────────────────────────────────
-# Pipeline
-# ─────────────────────────────────────────────────────────────
+
 
 def run(
     video_path:      str,
@@ -57,7 +55,6 @@ def run(
     """
     t0 = time.time()
 
-    # ── Validate ─────────────────────────────────────────────
     check_ffmpeg()
     if not os.path.isfile(video_path):
         raise FileNotFoundError(f"Video not found: {video_path}")
@@ -66,7 +63,6 @@ def run(
 
     ensure_dir(output_dir)
 
-    # All temp files go here
     temp_dir = os.path.join(output_dir, ".temp_pipeline")
     ensure_dir(temp_dir)
 
@@ -80,7 +76,6 @@ def run(
         border_style="cyan",
     ))
 
-    # ── Stage 1: Audio extraction ─────────────────────────────
     if progress_callback: progress_callback(1, "Extracting Audio...", 0.1)
     console.rule("[bold]Stage 1[/bold] · Audio Extraction")
     tracks      = list_audio_tracks(video_path)
@@ -88,16 +83,13 @@ def run(
     wav_path    = os.path.join(temp_dir, "audio.wav")
     extract_audio(video_path, wav_path, track_index=track_index)
 
-    # ── Stage 2: Transcription ────────────────────────────────
     if progress_callback: progress_callback(2, "Transcribing with Whisper...", 0.25)
     console.rule("[bold]Stage 2[/bold] · Whisper Transcription")
     words = transcribe(wav_path, model_name=whisper_model)
 
-    # Write full SRT for reference alongside the output
     srt_path = os.path.join(output_dir, "full_transcript.srt")
     words_to_srt(words, srt_path)
 
-    # ── Stage 3: Scene Scoring ────────────────────────────────
     if progress_callback: progress_callback(3, "AI Scene Scoring (Optimized)...", 0.45)
     console.rule("[bold]Stage 3[/bold] · AI Scene Scoring")
     score_result = score_video(
@@ -108,7 +100,6 @@ def run(
         progress_callback=progress_callback
     )
 
-    # ── Stage 4: Clip Selection ────────────────────────────────
     if progress_callback: progress_callback(4, "Selecting Best Moments...", 0.65)
     console.rule("[bold]Stage 4[/bold] · Selecting Best Moments")
     clips = select_clips(
@@ -121,7 +112,6 @@ def run(
         log.error("No clips could be selected. Aborting.")
         return []
 
-    # Print selection table
     table = Table(title="Selected Clips", border_style="cyan", show_lines=True)
     table.add_column("#",     style="bold cyan")
     table.add_column("Start", style="green")
@@ -136,7 +126,6 @@ def run(
         )
     console.print(table)
 
-    # ── Stage 5 & 6: Cut, Crop, Caption ───────────────────────
     if progress_callback: progress_callback(5, f"Creating {len(clips)} Shorts...", 0.8)
     console.rule("[bold]Stage 5[/bold] · Cutting, Cropping & Captioning")
 
@@ -149,12 +138,10 @@ def run(
     for i, (start_sec, end_sec) in enumerate(clips, 1):
         console.rule(f"[dim]Short {i} / {len(clips)}[/dim]")
 
-        # Determine face centroid at the midpoint of the clip
         mid_sec = int((start_sec + end_sec) / 2)
         ctr_idx = min(mid_sec, len(score_result.centroids) - 1)
         face_cx: Optional[float] = score_result.centroids[ctr_idx]
 
-        # --- Step A: Cut & smart-crop → vertical clip
         if progress_callback: progress_callback(5, f"Processing Short {i}/{len(clips)}: Cutting & Cropping", 0.8 + (i/len(clips)) * 0.1)
         raw_path = os.path.join(raw_clips_dir, f"raw_short_{i:02d}.mp4")
         cut_and_crop(
@@ -166,7 +153,6 @@ def run(
             add_blur_bg=True,
         )
 
-        # --- Step B: Burn captions
         if progress_callback: progress_callback(6, f"Processing Short {i}/{len(clips)}: Rendering Captions", 0.9 + (i/len(clips)) * 0.08)
         final_path = os.path.join(output_dir, f"short_{i:02d}.mp4")
         render_captions(
@@ -182,13 +168,11 @@ def run(
 
     if progress_callback: progress_callback(7, "Cleanup & Finishing...", 0.99)
 
-    # ── Stage 7: Cleanup ──────────────────────────────────────
     if not keep_temp:
         clean_temp(temp_dir)
 
     elapsed = time.time() - t0
 
-    # ── Summary ───────────────────────────────────────────────
     console.print(Panel(
         f"[bold green]✓ Done![/bold green]  "
         f"Created [cyan]{len(output_paths)}[/cyan] short(s) in {elapsed:.1f}s\n\n"

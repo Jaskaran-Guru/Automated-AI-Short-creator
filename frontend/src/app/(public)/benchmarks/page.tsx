@@ -24,7 +24,7 @@ export default function PublicBenchmarksPage() {
 
   return (
     <div className="bg-[#020617] min-h-screen text-white font-sans selection:bg-blue-500/30">
-      {/* Authority Header */}
+      {}
       <section className="pt-32 pb-20 px-6 border-b border-white/5 relative overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
         <div className="max-w-7xl mx-auto text-center relative z-10">
@@ -50,7 +50,7 @@ export default function PublicBenchmarksPage() {
         </div>
       </section>
 
-      {/* Benchmark Grid */}
+      {}
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-3 gap-8 mb-24">
             <Card className="lg:col-span-2 bg-slate-900/50 border-slate-800 p-10 rounded-[3rem] glass-panel">
@@ -120,7 +120,7 @@ export default function PublicBenchmarksPage() {
             </div>
         </div>
 
-        {/* Global Stats Bar */}
+        {}
         <div className="grid md:grid-cols-4 gap-12 py-16 border-y border-white/5 text-center">
             <div>
                 <p className="text-4xl font-black text-white mb-2">1.2M+</p>
@@ -141,7 +141,7 @@ export default function PublicBenchmarksPage() {
         </div>
       </section>
 
-      {/* CTA section */}
+      {}
       <section className="py-32 px-6">
         <div className="max-w-4xl mx-auto text-center bg-slate-900/50 border border-white/5 rounded-[3rem] p-16 glass-panel relative overflow-hidden">
             <div className="absolute -top-24 -left-24 w-64 h-64 bg-blue-600/10 blur-[80px] rounded-full" />

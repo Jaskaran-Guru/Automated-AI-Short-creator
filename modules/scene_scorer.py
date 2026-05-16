@@ -19,9 +19,7 @@ from modules.utils import log, make_progress
 import config
 
 
-# ─────────────────────────────────────────────────────────────
-# Internal helpers
-# ─────────────────────────────────────────────────────────────
+
 
 def _load_clip_model():
     log.info(f"Loading CLIP model '{config.CLIP_MODEL_NAME}' on {config.DEVICE} …")
@@ -42,7 +40,7 @@ def _load_clip_model():
 def _load_yolo_model():
     log.info(f"Loading YOLO model '{config.YOLO_MODEL_NAME}' …")
     model = YOLO(config.YOLO_MODEL_NAME)
-    # Move to device if possible
+
     try:
         model.to(config.DEVICE)
     except Exception:
@@ -50,9 +48,7 @@ def _load_yolo_model():
     return model
 
 
-# ─────────────────────────────────────────────────────────────
-# Frame extraction via FFmpeg pipe (Generator)
-# ─────────────────────────────────────────────────────────────
+
 
 def _extract_frames_gen(video_path: str, fps: int = 1) -> Generator[Image.Image, None, None]:
     """
@@ -67,8 +63,7 @@ def _extract_frames_gen(video_path: str, fps: int = 1) -> Generator[Image.Image,
         "-q:v", "5",
         "pipe:1",
     ]
-    
-    # Using a larger bufsize for the pipe
+
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=10**7)
     
     try:
@@ -77,7 +72,7 @@ def _extract_frames_gen(video_path: str, fps: int = 1) -> Generator[Image.Image,
             return
             
         while True:
-            # JPEG frames start with FF D8 and end with FF D9
+
             header = byte_stream.read(2)
             if not header:
                 break
@@ -93,11 +88,11 @@ def _extract_frames_gen(video_path: str, fps: int = 1) -> Generator[Image.Image,
                 if footer_idx != -1:
                     end_idx = int(footer_idx) + 2
                     jpeg_data.append(bytes(chunk[:end_idx]))
-                    # Found the end of a frame, now we need to put back 
-                    # whatever might be after the EOI marker. Actually, mjpeg 
-                    # pipe is pretty clean. We'll just break and yield.
-                    # No easy 'unread' for pipes, so we just assume mjpeg 
-                    # boundaries are clean for image2pipe.
+
+
+
+
+
                     break
                 jpeg_data.append(chunk)
             
@@ -116,9 +111,7 @@ def _extract_frames_gen(video_path: str, fps: int = 1) -> Generator[Image.Image,
             proc.kill()
 
 
-# ─────────────────────────────────────────────────────────────
-# Individual scorers (Batch based)
-# ─────────────────────────────────────────────────────────────
+
 
 def _process_clip_batch(
     batch: List[Image.Image],
@@ -133,7 +126,6 @@ def _process_clip_batch(
         feats = model.encode_image(tensors).float()
         feats /= feats.norm(dim=-1, keepdim=True)
 
-        # Broadcast dot product
         pos_sims = (feats @ pos_feats.T).mean(dim=-1)
         neg_sims = (feats @ neg_feats.T).mean(dim=-1)
         scores = torch.clamp(pos_sims - neg_sims, min=0.0)
@@ -156,11 +148,10 @@ def _process_visual_batch(
             batch_scores.append(0.0)
             batch_centroids.append(None)
         else:
-            # Score based on confidence sum
+
             conf_sum = float(boxes.conf.sum().item())
             batch_scores.append(min(1.0, conf_sum / 5.0))
-            
-            # Primary face/object centroid
+
             best_idx = int(boxes.conf.argmax())
             x1, y1, x2, y2 = boxes.xyxy[best_idx].tolist()
             img_w = batch[i].width
@@ -182,8 +173,7 @@ def _audio_energy_scores(audio_path: str, total_seconds: int) -> np.ndarray:
     hop_length   = sr
 
     rms = librosa.feature.rms(y=y, frame_length=frame_length, hop_length=hop_length)[0]
-    
-    # Trim or pad to match total_seconds
+
     if len(rms) > total_seconds:
         rms = rms[:total_seconds]
     elif len(rms) < total_seconds:
@@ -195,9 +185,7 @@ def _audio_energy_scores(audio_path: str, total_seconds: int) -> np.ndarray:
     return rms.astype(np.float32)
 
 
-# ─────────────────────────────────────────────────────────────
-# Public API
-# ─────────────────────────────────────────────────────────────
+
 
 class ScoreResult:
     def __init__(
@@ -227,7 +215,6 @@ def score_video(
     """
     log.info("=== Optimized Scene Scoring ===")
 
-    # First, get video duration to pre-allocate arrays (using ffprobe)
     try:
         cmd = [config.FFPROBE_BIN, "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", video_path]
         duration = float(subprocess.check_output(cmd).decode().strip())
@@ -236,7 +223,6 @@ def score_video(
         log.warning("Could not determine video duration via ffprobe, will estimate.")
         total_secs = 0
 
-    # Load models
     clip_model, clip_preprocess, pos_feats, neg_feats = (None, None, None, None)
     if use_clip:
         try:
@@ -253,7 +239,6 @@ def score_video(
             log.warning(f"Failed to load YOLO: {e}")
             use_yolo = False
 
-    # Initialize results
     all_clip_scores = []
     all_yolo_scores = []
     all_centroids   = []
@@ -262,33 +247,29 @@ def score_video(
     current_batch = []
     
     log.info(f"Processing frames with streaming (batch_size={batch_size}) …")
-    
-    # Process frames in batches
+
     for i, frame in enumerate(_extract_frames_gen(video_path, fps=config.FRAME_SAMPLE_RATE)):
-        # Poll cancellation
+
         if progress_callback and i % 10 == 0:
             progress_callback(3, f"AI Scene Scoring (Optimized)...", 0.45)
             
         current_batch.append(frame)
         
         if len(current_batch) >= batch_size:
-            # CLIP
+
             if use_clip:
                 c_scores = _process_clip_batch(current_batch, clip_model, clip_preprocess, pos_feats, neg_feats)
                 all_clip_scores.extend(c_scores)
-            
-            # YOLO
+
             if use_yolo:
                 y_scores, y_centers = _process_visual_batch(current_batch, yolo_model)
                 all_yolo_scores.extend(y_scores)
                 all_centroids.extend(y_centers)
-            
-            # Clear batch and keep memory low
+
             current_batch = []
             if config.DEVICE == "cuda":
                 torch.cuda.empty_cache()
 
-    # Process remaining
     if current_batch:
         if use_clip:
             all_clip_scores.extend(_process_clip_batch(current_batch, clip_model, clip_preprocess, pos_feats, neg_feats))
@@ -297,26 +278,21 @@ def score_video(
             all_yolo_scores.extend(y_scores)
             all_centroids.extend(y_centers)
 
-    # Cleanup models
     del clip_model
     del yolo_model
     if config.DEVICE == "cuda":
         torch.cuda.empty_cache()
 
     total_frames = len(all_clip_scores) if use_clip else (len(all_yolo_scores) if use_yolo else total_secs)
-    
-    # Handle lengths
+
     clip_arr  = np.array(all_clip_scores) if use_clip else np.zeros(total_frames)
     yolo_arr  = np.array(all_yolo_scores) if use_yolo else np.zeros(total_frames)
     
     centroids: List[Optional[float]] = list(all_centroids) if use_yolo else [None] * total_frames
 
-    
-    # Audio energy
     log.info("Computing audio energy …")
     audio_scores = _audio_energy_scores(audio_path, total_frames)
 
-    # Weights
     w_clip  = config.SCORE_WEIGHT_CLIP  if use_clip  else 0.0
     w_yolo  = config.SCORE_WEIGHT_YOLO  if use_yolo  else 0.0
     w_audio = config.SCORE_WEIGHT_AUDIO

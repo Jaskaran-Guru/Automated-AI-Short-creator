@@ -15,7 +15,6 @@ export async function POST(req: Request) {
     const workspace = await getCurrentWorkspace();
     if (!workspace) return new NextResponse("Workspace not found", { status: 404 });
 
-    // Ensure the requester is an OWNER or ADMIN
     const user = await db.user.findUnique({ where: { clerkId } });
     const membership = await db.workspaceMember.findUnique({
       where: {
@@ -36,7 +35,6 @@ export async function POST(req: Request) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    // Generate secure token
     const token = require("crypto").randomBytes(32).toString("hex");
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 day expiry
@@ -51,7 +49,6 @@ export async function POST(req: Request) {
       }
     });
 
-    // In production, we would send the email here
     console.log(`[AGENCY INVITE] Sent to ${email} for workspace ${workspace.name}. Token: ${token}`);
 
     return NextResponse.json(invite);

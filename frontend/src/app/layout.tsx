@@ -24,7 +24,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className="dark">
         <body className={`${font.className} bg-background text-foreground antialiased selection:bg-blue-500/30`}>
-          {/* Global Grain Overlay */}
+          {}
           <div className="grain-overlay" />
           
           <PostHogProvider>

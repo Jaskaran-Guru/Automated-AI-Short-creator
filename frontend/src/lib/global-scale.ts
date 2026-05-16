@@ -1,12 +1,7 @@
-﻿/**
- * VIRAIL Global Scale Engine
- * Multi-currency, timezone-aware, and localization utilities.
- * Powers international expansion into LATAM, India, EU, and US markets.
- */
+﻿
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// CURRENCY
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+
 
 export type SupportedCurrency = "USD" | "EUR" | "GBP" | "INR" | "BRL";
 
@@ -36,9 +31,8 @@ export function formatCurrency(
   }).format(converted);
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// REGION-BASED PRICING
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+
 
 export type Region = "US" | "EU" | "IN" | "LATAM" | "UK";
 
@@ -90,9 +84,8 @@ export function getPricingForRegion(region: Region) {
   return REGIONAL_PRICING[region];
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// TIMEZONE INTELLIGENCE
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+
 
 export const TIMEZONE_REGIONS: Record<string, string[]> = {
   "US/Eastern":  ["America/New_York", "America/Toronto"],
@@ -103,9 +96,7 @@ export const TIMEZONE_REGIONS: Record<string, string[]> = {
   "LATAM/Sao":   ["America/Sao_Paulo"],
 };
 
-/**
- * Converts a UTC posting hour to local time for display.
- */
+
 export function toLocalHour(utcHour: number, timezone: string): number {
   const now = new Date();
   now.setUTCHours(utcHour, 0, 0, 0);
@@ -113,14 +104,12 @@ export function toLocalHour(utcHour: number, timezone: string): number {
   return local.getHours();
 }
 
-/**
- * Returns a user-friendly "Best Time to Post" string for a given timezone.
- */
+
 export function getBestPostingWindow(
   platform: "TIKTOK" | "YOUTUBE_SHORTS" | "INSTAGRAM_REELS",
   timezone: string
 ): string {
-  // Peak windows in UTC
+
   const utcPeakWindows: Record<string, number[]> = {
     TIKTOK:           [12, 17, 19], // UTC
     YOUTUBE_SHORTS:   [13, 16, 18],
@@ -138,9 +127,8 @@ export function getBestPostingWindow(
   return localPeaks.join(", ");
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// SEO: hreflang helpers
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+
 
 export const SUPPORTED_LOCALES = ["en", "es", "hi", "pt"];
 
@@ -150,9 +138,7 @@ export function buildHreflangTags(path: string): string {
   ).join("\n");
 }
 
-/**
- * Maps a user's browser locale to a VIRAIL region.
- */
+
 export function detectRegionFromLocale(locale: string): Region {
   if (locale.startsWith("en-IN")) return "IN";
   if (locale.startsWith("en-GB")) return "UK";

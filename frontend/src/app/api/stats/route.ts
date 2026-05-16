@@ -16,7 +16,6 @@ export async function GET() {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-    // Fetch all clips for this workspace
     const clips = await db.clip.findMany({
       where: {
         project: { workspaceId: workspace.id }

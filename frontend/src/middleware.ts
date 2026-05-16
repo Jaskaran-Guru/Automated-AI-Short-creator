@@ -13,12 +13,10 @@ const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 export default clerkMiddleware(async (auth, request) => {
   const { userId, sessionClaims } = await auth();
 
-  // 1. Protect all non-public routes
   if (!isPublicRoute(request)) {
     await auth.protect();
   }
 
-  // 2. Protect admin routes based on metadata role
   if (isAdminRoute(request)) {
     const metadata = (sessionClaims?.metadata || {}) as any;
     const role = metadata.role || metadata.systemRole;

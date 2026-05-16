@@ -1,10 +1,4 @@
-/**
- * VIRAIL Revenue Predictability Engine
- * Removes revenue randomness by modeling forward projections
- * from real operational inputs.
- *
- * Run nightly or on-demand from /admin/forecast
- */
+
 import { db } from "./prisma";
 
 export interface RevenueInputs {
@@ -57,8 +51,7 @@ export function projectRevenue(inputs: RevenueInputs): RevenueProjection {
     expansionRate,
   } = inputs;
 
-  // â”€â”€ 7-Day Projection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // Trials converting within 7 days (trials typically convert in first 7d)
+
   const trialConversions7d = Math.round(activeTrials * trialConversionRate * 0.6);
   const demoCloses7d = Math.round(demosBookedThisWeek * demoToCloseRate * 0.4);
   const day7NewMRR = (trialConversions7d * avgRevenuePerUser) +
@@ -67,8 +60,7 @@ export function projectRevenue(inputs: RevenueInputs): RevenueProjection {
   const expansion7d = currentMRR * (expansionRate / 4);
   const day7TotalMRR = currentMRR + day7NewMRR - churnLoss7d + expansion7d;
 
-  // â”€â”€ 30-Day Projection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // Assumes weekly demo rate continues, trial pipeline refills
+
   const weeksInMonth = 4.33;
   const trialConversions30d = Math.round(activeTrials * trialConversionRate);
   const demoCloses30d = Math.round(demosBookedThisWeek * weeksInMonth * demoToCloseRate);
@@ -78,7 +70,6 @@ export function projectRevenue(inputs: RevenueInputs): RevenueProjection {
   const expansion30d = currentMRR * expansionRate;
   const day30TotalMRR = currentMRR + day30NewMRR - churnLoss30d + expansion30d;
 
-  // â”€â”€ Risk Flags â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const riskFlags: RevenueRiskFlag[] = [];
 
   if (monthlyChurnRate > 0.05) {
@@ -126,14 +117,12 @@ export function projectRevenue(inputs: RevenueInputs): RevenueProjection {
     });
   }
 
-  // â”€â”€ Confidence Score â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const criticalFlags = riskFlags.filter(f => f.severity === "CRITICAL").length;
   const warningFlags = riskFlags.filter(f => f.severity === "WARNING").length;
   const confidence: "HIGH" | "MEDIUM" | "LOW" =
     criticalFlags > 0 ? "LOW" :
     warningFlags > 1 ? "MEDIUM" : "HIGH";
 
-  // â”€â”€ Sensitivity Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const sensitivity: SensitivityItem[] = [
     {
       scenario: "Base Case",
@@ -173,10 +162,7 @@ export function projectRevenue(inputs: RevenueInputs): RevenueProjection {
   };
 }
 
-/**
- * Default inputs for VIRAIL's current operating stage.
- * Update these weekly from Stripe + EventLog data.
- */
+
 export const CURRENT_INPUTS: RevenueInputs = {
   currentMRR: 84500,
   activeTrials: 28,
@@ -190,9 +176,7 @@ export const CURRENT_INPUTS: RevenueInputs = {
   expansionRate: 0.04,
 };
 
-/**
- * Aggregates real data from Prisma to populate the RevenueInputs model.
- */
+
 export async function getLiveRevenueInputs(): Promise<RevenueInputs> {
   const now = new Date();
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -220,8 +204,7 @@ export async function getLiveRevenueInputs(): Promise<RevenueInputs> {
   ]);
 
   const currentMRR = workspaces.reduce((acc, ws) => acc + (planValues[ws.plan] || 0), 0);
-  
-  // Trial conversion rate = Won leads / Total leads (simplified)
+
   const trialConversionRate = totalLeadsMonth > 0 ? wonLeadsMonth.length / totalLeadsMonth : 0.2;
   
   const avgRevenuePerUser = wonLeadsMonth.length > 0 

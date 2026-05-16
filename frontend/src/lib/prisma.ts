@@ -1,4 +1,4 @@
-// Updated Prisma Client Export
+
 import { PrismaClient } from "@prisma/client";
 
 declare global {

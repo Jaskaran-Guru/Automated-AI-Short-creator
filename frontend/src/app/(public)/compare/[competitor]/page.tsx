@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-// SEO: These pages intercept high-intent "Alternative to X" searches
 const competitorData: Record<string, {
   name: string;
   tagline: string;
@@ -57,7 +56,7 @@ export default function ComparePage({ params }: { params: { competitor: string }
 
   return (
     <div className="bg-[#020617] min-h-screen text-white font-sans selection:bg-blue-500/30">
-      {/* Nav */}
+      {}
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-xl px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
@@ -72,7 +71,7 @@ export default function ComparePage({ params }: { params: { competitor: string }
         </div>
       </nav>
 
-      {/* Hero */}
+      {}
       <section className="pt-40 pb-24 px-6 relative overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-blue-600/5 blur-[100px] rounded-full pointer-events-none" />
         <div className="max-w-5xl mx-auto text-center relative z-10">
@@ -94,14 +93,14 @@ export default function ComparePage({ params }: { params: { competitor: string }
         </div>
       </section>
 
-      {/* Feature Matrix */}
+      {}
       <section className="py-24 px-6 bg-slate-950/50">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-xs font-black uppercase tracking-[0.3em] text-blue-500 text-center mb-16">
             Feature-by-Feature Comparison
           </h2>
           <Card className="bg-slate-900/50 border-slate-800 rounded-[3rem] overflow-hidden glass-panel">
-            {/* Header */}
+            {}
             <div className="grid grid-cols-3 p-8 border-b border-slate-800 bg-slate-900/30">
               <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Feature</div>
               <div className="text-center">
@@ -138,7 +137,7 @@ export default function ComparePage({ params }: { params: { competitor: string }
         </div>
       </section>
 
-      {/* VIRAIL Advantages */}
+      {}
       <section className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-xs font-black uppercase tracking-[0.3em] text-slate-500 text-center mb-16">
@@ -162,7 +161,7 @@ export default function ComparePage({ params }: { params: { competitor: string }
         </div>
       </section>
 
-      {/* Final CTA */}
+      {}
       <section className="py-32 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-8 leading-none italic">

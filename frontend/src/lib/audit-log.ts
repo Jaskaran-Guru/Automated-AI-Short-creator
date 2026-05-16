@@ -1,9 +1,7 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
-/**
- * Records an action in the workspace audit log.
- */
+
 export async function logAction(
   action: string, 
   entity: string, 

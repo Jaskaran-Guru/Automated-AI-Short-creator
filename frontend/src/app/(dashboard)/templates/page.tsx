@@ -10,7 +10,6 @@ export default function TemplatesPage() {
   const [kits, setKits] = useState<BrandKit[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Form state
   const [name, setName] = useState("")
   const [fontFamily, setFontFamily] = useState("Impact")
   const [primaryColor, setPrimaryColor] = useState("#ffffff")
@@ -28,7 +27,7 @@ export default function TemplatesPage() {
 
   const handleCreate = async () => {
     if (!name) return
-    // In a real app, pass the logged-in user's ID
+
     const newKit = await createBrandKit({ name, font_family: fontFamily, primary_color: primaryColor, user_id: 'mock-uuid' })
     if (newKit) {
       setKits([...kits, ...newKit])
@@ -54,7 +53,7 @@ export default function TemplatesPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Create Form */}
+        {}
         <Card className="bg-slate-900/50 border-slate-800 lg:col-span-1 h-fit">
           <CardHeader>
             <CardTitle className="text-white">Create New Template</CardTitle>
@@ -100,7 +99,7 @@ export default function TemplatesPage() {
           </CardContent>
         </Card>
 
-        {/* Templates List */}
+        {}
         <div className="lg:col-span-2 space-y-4">
           {loading ? (
             <div className="text-center text-slate-500 py-10">Loading templates...</div>

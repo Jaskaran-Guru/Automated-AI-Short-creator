@@ -8,7 +8,7 @@ import os
 import re
 import sys
 import os
-# Force AI model caches to a local writable directory
+
 _base_dir = os.path.dirname(os.path.abspath(__file__))
 _cache_dir = os.path.join(_base_dir, ".cache")
 os.environ["XDG_CACHE_HOME"] = _cache_dir
@@ -16,7 +16,6 @@ os.environ["WHISPER_CACHE_DIR"] = os.path.join(_cache_dir, "whisper")
 os.makedirs(_cache_dir, exist_ok=True)
 os.makedirs(os.environ["WHISPER_CACHE_DIR"], exist_ok=True)
 
-# Simplified Console for broad compatibility
 class SimpleConsole:
     def print(self, *args, **kwargs):
         import re
@@ -27,9 +26,8 @@ class SimpleConsole:
 
 console = SimpleConsole()
 
-# ─────────────────────────────────────────────────────────────
-# Path cleaner — handles PowerShell drag-and-drop quirks
-# ─────────────────────────────────────────────────────────────
+
+
 
 def clean_path(raw: str) -> str:
     """
@@ -40,12 +38,10 @@ def clean_path(raw: str) -> str:
     """
     p = raw.strip()
 
-    # PowerShell wraps drag-dropped paths as:  & 'path'  or  & "path"
     ps_match = re.match(r"^&\s*['\"](.+)['\"]$", p)
     if ps_match:
         return ps_match.group(1).strip()
 
-    # Plain quoted paths (double or single quotes)
     if (p.startswith('"') and p.endswith('"')) or \
        (p.startswith("'") and p.endswith("'")):
         return p[1:-1].strip()
@@ -53,16 +49,13 @@ def clean_path(raw: str) -> str:
     return p
 
 
-# ─────────────────────────────────────────────────────────────
-# Interactive prompts (when running without flags)
-# ─────────────────────────────────────────────────────────────
+
 
 def prompt_input() -> dict:
     """Ask the user a series of questions and return a settings dict."""
     console.print("\n--- AI Video Shorts Creator ---")
     console.print("Powered by Whisper · CLIP · YOLO · FFmpeg\n")
 
-    # ── Video path ────────────────────────────────────────────
     console.print("\nTip: You can drag & drop the video file directly into this window.")
     while True:
         raw        = input("\n📁  Video file path: ")
@@ -72,12 +65,10 @@ def prompt_input() -> dict:
             break
         console.print(f"  File not found: {video_path}  Please try again.")
 
-    # ── Output folder ─────────────────────────────────────────
     default_out = os.path.join(os.path.dirname(os.path.abspath(video_path)), "output")
     out_input   = input(f"\n📂  Output folder [default: {default_out}]: ").strip().strip('"')
     output_dir  = out_input if out_input else default_out
 
-    # ── Number of shorts ──────────────────────────────────────
     import config
     while True:
         n = input(f"\n🔢  How many shorts to create? [1-{config.MAX_SHORTS}]: ").strip()
@@ -86,7 +77,6 @@ def prompt_input() -> dict:
             break
         console.print(f"  Please enter a number between 1 and {config.MAX_SHORTS}.")
 
-    # ── Duration ──────────────────────────────────────────────
     console.print("\n⏱️   Duration options:")
     durations = {1: 15, 2: 30, 3: 45, 4: 60}
     for k, v in durations.items():
@@ -104,7 +94,6 @@ def prompt_input() -> dict:
                 break
         console.print("  Invalid choice.")
 
-    # ── Whisper model ─────────────────────────────────────────
     models = ["base", "small", "medium", "large", "large-v2"]
     console.print("\n🤖  Whisper model (larger = more accurate but slower):")
     for i, m in enumerate(models, 1):
@@ -116,7 +105,6 @@ def prompt_input() -> dict:
     else:
         whisper_model = config.WHISPER_MODEL
 
-    # ── Caption style ─────────────────────────────────────────
     console.print("\n🎬  Caption style:")
     console.print("  [1] word_highlight  — one word highlighted per beat (TikTok style)")
     console.print("  [2] full_line       — full subtitle line at once")
@@ -134,9 +122,7 @@ def prompt_input() -> dict:
     )
 
 
-# ─────────────────────────────────────────────────────────────
-# Argument parser (non-interactive / batch mode)
-# ─────────────────────────────────────────────────────────────
+
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
@@ -162,15 +148,12 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
-# ─────────────────────────────────────────────────────────────
-# Entry point
-# ─────────────────────────────────────────────────────────────
+
 
 def main():
     parser = build_parser()
     args   = parser.parse_args()
 
-    # If --input provided, use non-interactive mode
     if args.input:
         output_dir = args.output or os.path.join(
             os.path.dirname(os.path.abspath(args.input)), "output"
@@ -185,10 +168,9 @@ def main():
             interactive=not args.no_interactive,
         )
     else:
-        # Fully interactive mode
+
         settings = prompt_input()
 
-    # Run the pipeline
     import pipeline
     results = pipeline.run(
         video_path=settings["video_path"],

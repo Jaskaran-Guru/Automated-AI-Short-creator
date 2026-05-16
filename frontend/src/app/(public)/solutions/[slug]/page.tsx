@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-// Mock CMS Data for Solution Pages
 const solutions = {
   "podcast-clips": {
     title: "AI Short Clips for Podcasters",
@@ -37,7 +36,7 @@ export default function SolutionPage({ params }: { params: { slug: string } }) {
 
   return (
     <div className="bg-[#020617] min-h-screen text-white font-sans selection:bg-blue-500/30">
-      {/* Hero Section */}
+      {}
       <section className="relative pt-32 pb-20 px-6 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
         <div className="max-w-7xl mx-auto relative z-10">
@@ -81,7 +80,7 @@ export default function SolutionPage({ params }: { params: { slug: string } }) {
         </div>
       </section>
 
-      {/* ROI & Benefits */}
+      {}
       <section className="py-24 px-6 bg-slate-950/50">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8">
@@ -98,7 +97,7 @@ export default function SolutionPage({ params }: { params: { slug: string } }) {
         </div>
       </section>
 
-      {/* ROI Calculator Preview */}
+      {}
       <section className="py-32 px-6">
         <div className="max-w-5xl mx-auto bg-gradient-to-br from-blue-600 to-purple-700 rounded-[3rem] p-12 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-3xl rounded-full translate-x-20 -translate-y-20" />
@@ -139,7 +138,7 @@ export default function SolutionPage({ params }: { params: { slug: string } }) {
         </div>
       </section>
 
-      {/* Social Proof */}
+      {}
       <section className="pb-32 px-6">
         <div className="max-w-7xl mx-auto text-center">
             <h2 className="text-xs font-black uppercase tracking-[0.3em] text-slate-500 mb-16">Results from top creators</h2>

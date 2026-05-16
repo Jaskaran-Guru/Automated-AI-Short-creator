@@ -17,7 +17,6 @@ import { Badge } from "@/components/ui/badge";
 export default async function AdminIntelligencePage() {
   await protectAdminPage(["SUPER_ADMIN"]);
 
-  // Mocked Intelligence Metrics (In production, these come from CohortMetric and DailyMetric)
   const growthNiches = [
     { name: "Finance & Trading", growth: 124, activeUsers: 420 },
     { name: "True Crime / Mystery", growth: 88, activeUsers: 215 },

@@ -1,8 +1,4 @@
-/**
- * VIRAIL Retention Hard Systems
- * Retention is infrastructure, not a campaign.
- * This engine runs nightly and ensures no user silently churns.
- */
+
 import { db } from "./prisma";
 import { Plan } from "@prisma/client";
 
@@ -52,7 +48,6 @@ export function analyzeUserHealth(input: UserHealthInput): UserHealthReport {
   const signals: RetentionSignal[] = [];
   const triggers: RetentionTrigger[] = [];
 
-  // â”€â”€ INACTIVITY DECAY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (input.daysSinceLastLogin >= 30) {
     score -= 40; signals.push("INACTIVE_30D");
     triggers.push({
@@ -87,7 +82,6 @@ export function analyzeUserHealth(input: UserHealthInput): UserHealthReport {
     });
   }
 
-  // â”€â”€ USAGE LIMIT PROXIMITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const usagePct = input.minutesLimit > 0 ? input.minutesUsed / input.minutesLimit : 0;
   if (usagePct >= 1) {
     score -= 15; signals.push("LIMIT_REACHED");
@@ -107,7 +101,6 @@ export function analyzeUserHealth(input: UserHealthInput): UserHealthReport {
     });
   }
 
-  // â”€â”€ FEATURE ADOPTION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (!input.hasUsedScheduler && input.plan !== "FREE") {
     score -= 8; signals.push("FEATURE_NOT_ADOPTED");
     triggers.push({
@@ -128,7 +121,6 @@ export function analyzeUserHealth(input: UserHealthInput): UserHealthReport {
     });
   }
 
-  // â”€â”€ MILESTONE REWARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (input.totalClipsAllTime >= 100) {
     signals.push("MILESTONE_REACHED");
     triggers.push({
@@ -139,7 +131,6 @@ export function analyzeUserHealth(input: UserHealthInput): UserHealthReport {
     });
   }
 
-  // â”€â”€ POWER USER RECOGNITION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (input.clipsThisMonth >= 20 && input.hasInvitedTeamMember) {
     score = Math.min(100, score + 5);
     signals.push("POWER_USER");
@@ -151,7 +142,6 @@ export function analyzeUserHealth(input: UserHealthInput): UserHealthReport {
     });
   }
 
-  // â”€â”€ DOWNGRADE RISK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (input.plan !== "FREE" && usagePct < 0.1 && input.daysSinceLastClip > 14) {
     score -= 20; signals.push("DOWNGRADE_RISK");
     triggers.push({
@@ -171,19 +161,14 @@ export function analyzeUserHealth(input: UserHealthInput): UserHealthReport {
   return { userId: input.userId, healthScore: score, tier, signals, triggers };
 }
 
-/**
- * Batch process health reports for a cohort of users.
- * Returns prioritized list â€” CRITICAL first.
- */
+
 export function batchHealthCheck(users: UserHealthInput[]): UserHealthReport[] {
   return users
     .map(analyzeUserHealth)
     .sort((a, b) => a.healthScore - b.healthScore);
 }
 
-/**
- * Fetches real usage data for all users to feed into the health engine.
- */
+
 export async function getLiveHealthReports(): Promise<UserHealthReport[]> {
   const users = await db.user.findMany({
     include: {

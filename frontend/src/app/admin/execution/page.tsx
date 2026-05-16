@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 export default async function ExecutionPage() {
   await protectAdminPage(["SUPER_ADMIN"]);
 
-  // In production: fetched from a WeeklyReview DB model
   const lastWeek = {
     mrrDelta: +4200,
     trialsStarted: 12,
@@ -58,7 +57,7 @@ export default async function ExecutionPage() {
         </Badge>
       </div>
 
-      {/* Last Week Numbers */}
+      {}
       <div className="grid grid-cols-3 md:grid-cols-7 gap-3 mb-10">
         {[
           { label: "MRR Delta", value: `+$${lastWeek.mrrDelta.toLocaleString()}`, good: true },
@@ -77,7 +76,7 @@ export default async function ExecutionPage() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8 mb-8">
-        {/* What Moved Revenue */}
+        {}
         <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-[2.5rem] glass-panel">
           <div className="flex items-center gap-3 mb-8">
             <TrendingUp className="w-5 h-5 text-emerald-500" />
@@ -101,7 +100,7 @@ export default async function ExecutionPage() {
           </div>
         </Card>
 
-        {/* Bottlenecks */}
+        {}
         <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-[2.5rem] glass-panel">
           <div className="flex items-center gap-3 mb-8">
             <AlertTriangle className="w-5 h-5 text-amber-500" />
@@ -123,7 +122,7 @@ export default async function ExecutionPage() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8 mb-8">
-        {/* This Week Priorities */}
+        {}
         <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-[2.5rem] glass-panel">
           <div className="flex items-center gap-3 mb-8">
             <Target className="w-5 h-5 text-blue-500" />
@@ -147,7 +146,7 @@ export default async function ExecutionPage() {
           </div>
         </Card>
 
-        {/* Remove This Week */}
+        {}
         <Card className="bg-slate-900/50 border-slate-800 p-8 rounded-[2.5rem] glass-panel border-red-500/10">
           <div className="flex items-center gap-3 mb-8">
             <XCircle className="w-5 h-5 text-red-500" />

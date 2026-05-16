@@ -13,7 +13,6 @@ function createWindow() {
     backgroundColor: '#000000',
   });
 
-  // Use app.isPackaged to distinguish between dev and prod
   const startUrl = !app.isPackaged
     ? 'http://localhost:3000' 
     : `file://${path.join(__dirname, '../frontend/out/index.html')}`;

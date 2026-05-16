@@ -54,7 +54,7 @@ export default function MarketplacePage() {
   ];
 
   const handlePurchase = (item: any) => {
-    // Redirect to checkout or details page
+
     router.push(`/dashboard/marketplace/item/${item.id}`);
   }
 

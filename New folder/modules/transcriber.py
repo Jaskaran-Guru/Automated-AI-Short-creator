@@ -4,15 +4,12 @@ import re
 from typing import List, Dict, Optional
 from dataclasses import dataclass
 
-# import whisper (lazy loaded)
 
 from modules.utils import log, ensure_dir, seconds_to_hms
 import config
 
 
-# ─────────────────────────────────────────────────────────────
-# Data structures
-# ─────────────────────────────────────────────────────────────
+
 
 @dataclass
 class WordEntry:
@@ -21,9 +18,7 @@ class WordEntry:
     end:   float   # seconds
 
 
-# ─────────────────────────────────────────────────────────────
-# Transcription
-# ─────────────────────────────────────────────────────────────
+
 
 def transcribe(
     audio_path: str,
@@ -73,9 +68,7 @@ def transcribe(
     return words
 
 
-# ─────────────────────────────────────────────────────────────
-# SRT Export
-# ─────────────────────────────────────────────────────────────
+
 
 def _srt_ts(seconds: float) -> str:
     """Convert seconds → SRT timestamp HH:MM:SS,mmm"""
@@ -92,7 +85,6 @@ def words_to_srt(words: List[WordEntry], srt_path: str, words_per_line: int = 8)
     """
     ensure_dir(os.path.dirname(srt_path))
 
-    # Group into chunks of N words
     groups = [words[i:i+words_per_line] for i in range(0, len(words), words_per_line)]
 
     lines = []
@@ -109,9 +101,7 @@ def words_to_srt(words: List[WordEntry], srt_path: str, words_per_line: int = 8)
     return srt_path
 
 
-# ─────────────────────────────────────────────────────────────
-# ASS Export (with karaoke word-highlight via \kf tags)
-# ─────────────────────────────────────────────────────────────
+
 
 ASS_HEADER = """\
 [Script Info]
@@ -185,7 +175,6 @@ def words_to_ass(
         if line_end <= 0:
             continue
 
-        # Build karaoke text: {\kf<centiseconds>}word
         parts = []
         for w in group:
             duration_cs = max(1, int((w.end - w.start) * 100))
@@ -205,9 +194,7 @@ def words_to_ass(
     return ass_path
 
 
-# ─────────────────────────────────────────────────────────────
-# Clip-scoped helpers
-# ─────────────────────────────────────────────────────────────
+
 
 def words_in_window(words: List[WordEntry], start: float, end: float) -> List[WordEntry]:
     """Return only the words that fall within [start, end]."""
