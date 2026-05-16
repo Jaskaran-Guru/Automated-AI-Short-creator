@@ -118,7 +118,52 @@ export default function NewProjectPage() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'video}
+    accept: { 'video/*': ['.mp4', '.mov', '.webm'] },
+    multiple: false
+  })
+
+  const handleStartGeneration = async () => {
+    setCurrentStep(2)
+    try {
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          videoUrl,
+          numShorts,
+          duration,
+          captionStyle,
+          platform,
+          estimatedDurationSeconds,
+        }),
+      });
+
+      if (res.status === 402) {
+        setShowUpgradeModal(true);
+        setCurrentStep(1);
+        return;
+      }
+
+      if (!res.ok) throw new Error("Failed to create project");
+      const data = await res.json();
+      
+      router.push(`/project/${data.id}`);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to start generation.");
+      setCurrentStep(1);
+    }
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-12">
+        <h1 className="text-3xl font-bold text-white mb-2">Create New Project</h1>
+        <p className="text-slate-400">Transform your long video into viral shorts in minutes.</p>
+      </div>
+
       <div className="mb-12">
         <div className="flex items-center justify-between relative px-2">
           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-slate-800 -z-10"></div>
