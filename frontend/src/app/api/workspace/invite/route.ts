@@ -68,7 +68,7 @@ export async function POST(req: Request) {
           </div>
         `
       });
-      console.log(`[AGENCY INVITE] Sent email to ${email} for workspace ${workspace.name}.`);
+      console.log(`[AGENCY INVITE] Sent email to ${email} for workspace ${workspace.name}. Token: ${token}`);
     } else {
       console.log(`[AGENCY INVITE] Resend API key missing. Mock sent to ${email} for workspace ${workspace.name}. Token: ${token}`);
     }
