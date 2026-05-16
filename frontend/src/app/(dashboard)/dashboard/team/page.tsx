@@ -49,14 +49,28 @@ export default function TeamPage() {
     if (!inviteEmail) return;
     setIsInviting(true);
     try {
+        const res = await fetch("/api/workspace/invite", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: inviteEmail, role: "EDITOR" })
+        });
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        alert(`Invitation sent to ${inviteEmail}!`);
-        setIsInviteModalOpen(false);
-        setInviteEmail("");
-        fetchData(); // Refresh list
+        if (res.ok) {
+          const invite = await res.json();
+          const inviteUrl = `${window.location.origin}/invite/${invite.token}`;
+          
+          alert(`Invitation created! Share this link with your team member: \n\n${inviteUrl}`);
+          
+          setIsInviteModalOpen(false);
+          setInviteEmail("");
+          fetchData();
+        } else {
+          const error = await res.text();
+          alert(`Failed to create invite: ${error}`);
+        }
     } catch (err) {
         console.error(err);
+        alert("Failed to send invitation. Please try again.");
     } finally {
         setIsInviting(false);
     }
